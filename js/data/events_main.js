@@ -2474,12 +2474,15 @@
     id: 'ev_langxi', title: '狼袭',
     text: '风向变了。你后颈的汗毛根根竖起——草木深处，几点绿油油的光正朝你围拢过来。',
     tags: ['狼', '险地'],
-    baseWeight: 14, once: false,
+    baseWeight: 9, once: false,
     cond: { any: [{ loc: 'heishan_waiwei' }, { loc: 'heishan_shenchu' }] },
     prefer: {
       tend: { xuejian: 0.5 },
       locTags: ['狼'],
-      wvar: [{ id: 'wolfThreat', gte: 50, boost: 1.8 }]
+      wvar: [
+        { id: 'wolfThreat', gte: 50, boost: 1.7 },   // 狼患日炽时多发
+        { id: 'wolfThreat', lte: 20, boost: 0.3 }    // 狼患消退后渐稀（配合境界越高狼患越退）
+      ]
     },
     choices: [
       {

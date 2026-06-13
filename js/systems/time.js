@@ -109,7 +109,9 @@
   // ---- 世界自漂移（契约 §12 基准） ----
   function drift() {
     var w = G.world, T = G.sys.time;
-    T.setWvar('wolfThreat', w.vars.wolfThreat + 1.5);               // 狼患自涨；狩猎类行动/老猎户会压
+    // 狼患自涨；但修士境界渐高、威压渐重，山中野狼自然退避——境界越高涨势越缓，炼气中期后转为消退（后期狼袭渐稀）
+    var wolfDrift = 1.5 - (G.player ? (G.player.realmIdx || 0) * 0.6 : 0);
+    T.setWvar('wolfThreat', w.vars.wolfThreat + wolfDrift);         // 狩猎类行动/老猎户亦会压
     var xieyingAlive = !w.flags['_bossdead_shanmiao_xieying'];
     T.setWvar('ghostQi', w.vars.ghostQi + (xieyingAlive ? 1 : -0.5)); // 邪影在世阴气积累
     T.setWvar('mineInstability', w.vars.mineInstability + 0.8);

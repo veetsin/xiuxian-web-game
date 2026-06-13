@@ -104,8 +104,9 @@
     // 地图点击移动（不耗月；战斗/事件中禁止）
     travel: function (locId) {
       if (showBlocked(blockedReason())) return false;
+      var p = G.player;
       var L = G.locState(locId);
-      if (!L || !L.discovered || p.location === locId) return false;
+      if (!L || !p || !L.discovered || p.location === locId) return false;
       p.location = locId;
       var def = G.get('location', locId);
       G.log('你动身去了' + (def ? def.name : locId) + '。', '平');
