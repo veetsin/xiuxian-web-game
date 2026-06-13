@@ -384,6 +384,8 @@
     }
     runHooks('roundEnd');
     if (checkEnemyDead()) return;
+    var dz = G.sys.daoxin.combatDisrupt(); // 道心逆冲：气机偶尔抢节奏
+    if (dz) clog(dz.t, dz.style);
     c.round++;
   }
 

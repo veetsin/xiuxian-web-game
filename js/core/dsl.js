@@ -117,6 +117,7 @@
         } break;
         case 'chance': ok = G.rng.chance(v); break; // 仅用于 outcomes 分支
         case 'pet': ok = G.sys.beast.condop(v); break; // 驭兽条件，委托 beast.js（见其文件头 §C）
+        case 'daoxin': ok = G.sys.daoxin.condop(v); break; // 道心冲突条件，委托 daoxin.js（见其文件头）
         default:
           console.warn('[DSL] 未知条件 op:', k);
           ok = true;
@@ -266,6 +267,7 @@
         case 'daoAdvance': G.sys.dao.advance(v); break;   // 扩展：顿悟「纳之」
         case 'daoSuppress': G.sys.dao.suppress(v); break; // 扩展：顿悟「抑之」
         case 'pet': G.sys.beast.fxop(v); break;           // 驭兽效果，委托 beast.js（见其文件头 §B）
+        case 'daoxin': G.sys.daoxin.fxop(v); break;       // 道心调和效果，委托 daoxin.js
         default:
           console.warn('[DSL] 未知效果 op:', key, op);
       }

@@ -54,6 +54,12 @@
         case 'season': if (G.IDS.seasons.indexOf(v) < 0) warn(where + ' 未知季节:' + v); break;
         case 'weather': if (G.IDS.weathers.indexOf(v) < 0) warn(where + ' 未知天气:' + v); break;
         case 'pet': if (v && v.species) ck('beastlore', v.species, where + '.pet'); break; // 驭兽条件
+        case 'daoxin': // 道心条件：conflict/zhuxiu/tiaohe 引用的道 id
+          if (v) {
+            (v.conflict || v.tiaohe || []).forEach(function (d) { ckDao(d, where + '.daoxin'); });
+            if (v.zhuxiu) ckDao(v.zhuxiu, where + '.daoxin');
+          }
+          break;
       }
     }
   }
@@ -102,6 +108,9 @@
             break;
           case 'pet':                                // 驭兽效果（单一 op，{pet:{op:'...'}}）
             if (v && v.species) ck('beastlore', v.species, where + '.pet'); // gain 的物种引用
+            break;
+          case 'daoxin':                             // 道心调和效果 {daoxin:{op:'tiaohe',pair}}
+            if (v && v.pair) v.pair.forEach(function (d) { ckDao(d, where + '.daoxin'); });
             break;
         }
       }

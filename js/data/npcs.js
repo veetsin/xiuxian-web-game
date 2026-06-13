@@ -12,6 +12,12 @@
 //   dashixiong_li_guan    大师兄拜入仙门离镇（复仇线时限！挑战大师兄的行动/事件请加 noflag）
 //   miaozhu_yeji          有人撞见庙祝子时倒插香（邪神线铺垫，C3 庙线可引）
 //   miaozhu_shizong       庙祝失踪（庙门里拴、香灰尚温；C3 邪神线主咬合点）
+//   miaozhu_shi_zhou      庙祝施粥济你（凡身境界态度，每世一次）
+//   dsx_dai_zayi          大师兄拿你当杂役（凡身境界态度，每世一次）
+//   dsx_shi_duishou       大师兄视你为对手（引气境界态度，每世一次）
+//   dsx_jiaolv            大师兄焦虑闭死关（炼气中期境界态度，每世一次）
+//   dsx_qiu_zhidian       大师兄登门求指点（你超过他后，每世一次）
+//   dsx_jizou             大师兄嫉妒离镇（你超过他后；连带置 dashixiong_li_guan）
 //   sanxiu_dingshang      劫道散修已盯上玩家（拦路事件已入队的防重门闩）
 //   sanxiu_guifu          劫道散修被玩家威压/打服，金盆洗手
 //   xianmen_jieyi         玩家杀气太重，仙门起了戒心（C3 可引）
@@ -21,6 +27,11 @@
 //   zhouji_liehu / shou_guo_miao / enshi_sanxiu   三件阴德事（social.js 善人称号引）
 //   ting_guo_houdian      守夜时听过后殿门响（C3 庙线可引）
 //   laoban_dandu_dianbo / laoban_song_yao         药铺老板丹毒提点/赠药（每世一次门闩）
+//   laoban_gu_gong / laoban_bian_yao / laoban_qiu_ren / laoban_ya_canfang
+//                         药铺老板境界态度四闩（凡身雇工/引气辨灵药/炼气求救人遮账/筑基押残方）
+//   liehu_jiao_lie / liehu_qing_hushan            老猎户境界态度（凡身教打猎/炼气后期请护山）
+//   miaozhu_qiu_zhen      庙祝求你镇庙（炼气后期境界态度，每世一次）
+//   xunshi_yali / xunshi_shitan / xunshi_gaitai   巡使境界态度三闩（低压人/同试探/高招揽退让）
 //   liehu_song_hufu       老猎户赠兽骨护符（每世一次门闩）
 //   gei_guo_mailuqian     给过散修买路钱（social.js 今昔对比与“双手奉还”反馈引）
 //   sha_le_sanxiu         杀人越货，抹了散修的脖子
@@ -104,6 +115,30 @@
           { log: { t: '老猎户托货郎捎来一枚他亲手磨的兽骨符：「山里头，带着它。」', style: '吉' } }
         ],
         note: '赠兽骨护符'
+      },
+      // ── 境界态度（task §0.5：从教你打猎 → 请你护山）──
+      { // 凡身：把你当个能调教的好苗子，手把手教你认兽踪下套（每世一次）
+        cond: { realm: { lte: 0 }, npcFav: { id: 'lao_liehu', gte: 10 }, nopflag: 'liehu_jiao_lie' },
+        chance: 0.2,
+        effects: [
+          { pflagSet: { id: 'liehu_jiao_lie' } },
+          { npcFavAdd: { id: 'lao_liehu', n: 3 } },
+          { tendAdd: { lianti: 1 } },
+          { log: { t: '老猎户拽你蹲在雪地里，按着你的手认狼爪印：「深的是公的，浅的是母的。学会看脚印，山才认你。」', style: '体' } }
+        ],
+        note: '凡身：教你打猎'
+      },
+      { // 炼气后期起：你成了山里压得住场的人，老人拉下脸求你替他护一护这座养命的山（每世一次）
+        cond: { realm: { gte: 4 }, npcFav: { id: 'lao_liehu', gte: 25 }, nopflag: 'liehu_qing_hushan',
+          wvar: { id: 'wolfThreat', gte: 40 } },
+        chance: 0.35,
+        effects: [
+          { pflagSet: { id: 'liehu_qing_hushan' } },
+          { npcFavAdd: { id: 'lao_liehu', n: 6 } },
+          { wvarAdd: { wolfThreat: -4 } },
+          { log: { t: '老猎户摩挲着那把卷了刃的猎刀，半晌才开口：「我这把老骨头，压不住黑山了。这山……往后托给你，行么？」', style: '世界' } }
+        ],
+        note: '炼气后期：请你护山'
       }
     ]
   });
@@ -215,6 +250,57 @@
           { log: { t: '掌柜的塞给你一只黑陶罐，没收钱：「再这么吃下去，神仙难救。」', style: '丹' } }
         ],
         note: '丹毒深重，赠涤秽汤'
+      },
+      // ── 境界态度（spec §0.5：凡身卖药雇工 → 引气试探辨灵药 → 炼气求救人/遮旧账 → 筑基拿祖传残方赌一次）──
+      { // 凡身：把你当个能跑腿的力气，雇你担药晒药（每世一次）
+        cond: { realm: { lte: 0 }, nopflag: 'laoban_gu_gong' },
+        chance: 0.25,
+        effects: [
+          { pflagSet: { id: 'laoban_gu_gong' } },
+          { money: 3 },
+          { log: { t: '「后院那几筐药材，趁日头好搬出去晒晒。」掌柜的扔给你几个钱，把你当伙计使唤。', style: '平' } }
+        ],
+        note: '凡身：雇你做杂役'
+      },
+      { // 引气：看出你身上有了气机，借口请你帮辨一味拿不准的灵药（每世一次）
+        cond: { realm: { gte: 1, lte: 1 }, nopflag: 'laoban_bian_yao' },
+        chance: 0.3,
+        effects: [
+          { pflagSet: { id: 'laoban_bian_yao' } },
+          { npcFavAdd: { id: 'yaopu_laoban', n: 4 } },
+          { tendAdd: { danyao: 1 } },
+          { log: { t: '掌柜的捧出个锦盒，半试探半客气：「你近来气色不一般。帮老朽掌掌眼，这味药，到底是不是真灵物？」', style: '丹' } }
+        ],
+        note: '引气：试探辨灵药'
+      },
+      { // 炼气初期起：开始求你的境界办凡人办不了的事——救病重的人 / 遮一笔见不得光的旧账（每世一次）
+        cond: { realm: { gte: 2 }, npcFav: { id: 'yaopu_laoban', gte: 15 }, nopflag: 'laoban_qiu_ren' },
+        chance: 0.35,
+        effects: [
+          { pflagSet: { id: 'laoban_qiu_ren' } },
+          { npcFavAdd: { id: 'yaopu_laoban', n: 6 } },
+          { tendAdd: { yinguo: 1 } },
+          { branch: { cond: { wvar: { id: 'villageFear', gte: 45 } }, then: [
+            { wvarAdd: { villageFear: -3 } },
+            { log: { t: '掌柜的破天荒求上门来：「东头王家小儿急症，凡药压不住。你这样的人……能不能搭把手救他一命？」', style: '丹' } }
+          ], else: [
+            { log: { t: '掌柜的支开旁人，压低声音：「柜下那些不便明说的山货账，往年没人查。如今你成了气候——替老朽圆一圆，行么？」', style: '丹' } }
+          ] } }
+        ],
+        note: '炼气：求你救人/遮旧账'
+      },
+      { // 筑基：把祖传的半张残方押给你，赌你这尊大的能给回春堂挣个万世名（每世一次）
+        cond: { realm: { gte: 6 }, npcFav: { id: 'yaopu_laoban', gte: 25 }, nopflag: 'laoban_ya_canfang' },
+        chance: 0.5,
+        effects: [
+          { pflagSet: { id: 'laoban_ya_canfang' } },
+          { npcFavAdd: { id: 'yaopu_laoban', n: 10 } },
+          { itemAdd: { id: 'dihui_tang', n: 2 } },
+          { tendAdd: { danyao: 2 } },
+          { rumorAdd: { t: '回春堂的掌柜把锁了三代的药匣捧给了那位，说宁可一辈子的招牌押在他身上。', fame: 2 } },
+          { log: { t: '掌柜的颤巍巍捧出一只油布包：「回春堂祖上传下的半张残方，老朽参不透。你是要登天的人——这一注，老朽押你。」', style: '丹' } }
+        ],
+        note: '筑基：拿祖传残方赌一次'
       }
     ]
   });
@@ -320,6 +406,61 @@
           { rumorAdd: { t: '又有外乡把式来踢馆，没走过大师兄三招，被拎着后领扔出了门。', fame: 0 } }
         ],
         note: '踢馆者衬托其强'
+      },
+      // ── 境界态度（spec §0.5：凡身视你为杂役 → 引气视你为对手 → 炼气中期焦虑/闭关/抢机缘 → 你超过他后拜服/嫉妒/离镇/求指点）──
+      { // 凡身：他根本没把你放眼里，撂下杂役活计支使你（每世一次）
+        cond: { realm: { lte: 0 }, noflag: ['dashixiong_li_guan', 'dsx_dai_zayi'] },
+        chance: 0.2,
+        effects: [
+          { flagSet: { id: 'dsx_dai_zayi' } },
+          { npcFavAdd: { id: 'dashixiong', n: -1 } },
+          { log: { t: '你在武馆门口候着，大师兄正眼没瞧你，下巴往石锁一抬：「想看拳？先把校场那滩水扫了。」', style: '体' } }
+        ],
+        note: '凡身：视你为杂役'
+      },
+      { // 引气：察觉你也踏上了路，把你记成一个潜在的对手（每世一次）
+        cond: { realm: { gte: 1, lte: 1 }, noflag: ['dashixiong_li_guan', 'dsx_shi_duishou'] },
+        chance: 0.3,
+        effects: [
+          { flagSet: { id: 'dsx_shi_duishou' } },
+          { npcFavAdd: { id: 'dashixiong', n: 2 } },
+          { rumorAdd: { t: '大师兄打听了你的根脚，听完没说话，独自在校场把那趟拳又走了三遍。', fame: 0 } }
+        ],
+        note: '引气：视你为对手'
+      },
+      { // 炼气中期：你追得太紧，他焦虑——闭关、抢机缘、把自己逼得更狠（每世一次，需他尚未破入炼气离镇）
+        cond: { realm: { gte: 3 }, noflag: ['dashixiong_li_guan', 'dsx_jiaolv'],
+          npcFav: { id: 'dashixiong', lte: 35 } },
+        chance: 0.35,
+        effects: [
+          { flagSet: { id: 'dsx_jiaolv' } },
+          { wvarAdd: { sectAttention: 3 } },
+          { rumorAdd: { t: '大师兄闭了馆门，谁也不见，说要闭死关。有徒弟听见里头夜夜捶墙，像是憋着一口咽不下的气。', fame: 0 } }
+        ],
+        note: '炼气中期：焦虑闭关'
+      },
+      { // 你彻底超过他、又交情不薄：他放下身段，登门求一句指点（每世一次）
+        cond: { realm: { gte: 4 }, noflag: ['dashixiong_li_guan', 'dsx_qiu_zhidian'],
+          npcFav: { id: 'dashixiong', gte: 40 } },
+        chance: 0.4,
+        effects: [
+          { flagSet: { id: 'dsx_qiu_zhidian' } },
+          { npcFavAdd: { id: 'dashixiong', n: 5 } },
+          { tendAdd: { lianti: 1 } },
+          { log: { t: '大师兄寻上门来，拳头攥了又松：「我这身蛮力，撞到顶了，再练就是死路。你……肯不肯指我一条道？」', style: '体' } }
+        ],
+        note: '你超过他后：拜服求指点'
+      },
+      { // 你超过他、交情却淡：嫉妒梗在心里，索性收拾行囊离镇另投高门（每世一次）
+        cond: { realm: { gte: 4 }, noflag: ['dashixiong_li_guan', 'dsx_jizou'],
+          npcFav: { id: 'dashixiong', lte: 20 } },
+        chance: 0.3,
+        effects: [
+          { flagSet: { id: 'dsx_jizou' } },
+          { flagSet: { id: 'dashixiong_li_guan' } },   // 沿用既有离镇门闩，复仇/挑战线据此收束
+          { rumorAdd: { t: '大师兄不告而别。临走撂下一句：「这镇子，已经容不下两条龙了。」听的人不知他指谁。', fame: 0 } }
+        ],
+        note: '你超过他后：嫉妒离镇'
       }
     ]
   });
@@ -422,6 +563,30 @@
           { log: { t: '庙祝塞给你一道朱砂符：「夜里听见有人叫你的名字，别应。」', style: '因果' } }
         ],
         note: '赠符叮嘱'
+      },
+      // ── 境界态度（task §0.5：从施粥 → 求你镇庙）──
+      { // 凡身：你是个穷困的香客，他从舍粥的锅里多盛你一碗（每世一次）
+        cond: { realm: { lte: 0 }, noflag: ['miaozhu_shizong', 'miaozhu_shi_zhou'] },
+        chance: 0.18,
+        effects: [
+          { flagSet: { id: 'miaozhu_shi_zhou' } },
+          { hp: 1 },
+          { log: { t: '庙祝见你面黄肌瘦，从殿后那口大锅里给你多舀了一勺稠的：「神爷不嫌人穷。吃饱了，路才走得动。」', style: '平' } }
+        ],
+        note: '凡身：施粥'
+      },
+      { // 炼气后期起：阴气压不住了，瘦得像香的老人反过来求你这有道行的人替他镇一镇庙（每世一次）
+        cond: { realm: { gte: 4 }, npcFav: { id: 'miaozhu', gte: 25 }, noflag: 'miaozhu_shizong',
+          nopflag: 'miaozhu_qiu_zhen', wvar: { id: 'ghostQi', gte: 45 } },
+        chance: 0.35,
+        effects: [
+          { pflagSet: { id: 'miaozhu_qiu_zhen' } },
+          { npcFavAdd: { id: 'miaozhu', n: 6 } },
+          { tendAdd: { xianghuo: 1 } },
+          { wvarAdd: { ghostQi: -2 } },
+          { log: { t: '庙祝枯手攥住你的袖子，眼里头一回有了惧色：「后殿那扇门，我压不住了。你身上有香火，替我守一守这庙……求你了。」', style: '因果' } }
+        ],
+        note: '炼气后期：求你镇庙'
       }
     ]
   });
@@ -508,6 +673,49 @@
           { rumorAdd: { t: '巡使临行前留了句话：「镇上煞气太重。仙门，记下了。」', fame: 0 } }
         ],
         note: '煞气入册'
+      },
+      // ── 境界态度（spec §0.5：低境界压人 → 同境界试探 → 高境界招揽/上报/卖情报/退让；巡使 realm0=4 炼气后期）──
+      { // 你低他一大截（凡身~引气）：他懒得收敛威压，言语间把你压得抬不起头（每世一次）
+        cond: { monthIn: [9], realm: { lte: 1 }, nopflag: 'xunshi_yali' },
+        chance: 0.5,
+        effects: [
+          { pflagSet: { id: 'xunshi_yali' } },
+          { counterAdd: { xinmo: 1 } },
+          { log: { t: '你在驿馆外探头，巡使扇骨一指你，凉凉道：「凡夫俗子，离贵人远些。」一股无形的气压得你膝头发软。', style: '凶' } }
+        ],
+        note: '低境界：压人'
+      },
+      { // 与他境界相当（炼气中后期）：他收了轻慢，改用试探的眼光打量你（每世一次）
+        cond: { monthIn: [9], realm: { gte: 3, lte: 4 }, nopflag: 'xunshi_shitan' },
+        chance: 0.6,
+        effects: [
+          { pflagSet: { id: 'xunshi_shitan' } },
+          { npcFavAdd: { id: 'waimen_xunshi', n: 4 } },
+          { wvarAdd: { sectAttention: 4 } },
+          { log: { t: '巡使收了折扇，破例为你斟了盏茶，话里藏着钩子：「足下这一身气机，是哪位高人传的？说来听听。」', style: '平' } }
+        ],
+        note: '同境界：试探'
+      },
+      { // 你境界过了他（炼气圆满及以上）：他改了称呼，或招揽、或卖你一份仙门情报、或干脆退让（每世一次）
+        cond: { monthIn: [9], realm: { gte: 5 }, nopflag: 'xunshi_gaitai' },
+        chance: 0.7,
+        effects: [
+          { pflagSet: { id: 'xunshi_gaitai' } },
+          { npcFavAdd: { id: 'waimen_xunshi', n: 8 } },
+          { branch: { cond: { counter: { id: 'shaqi', gte: 40 } }, then: [
+            // 杀气重：他不敢招揽，只压着戒心退让，回去如实上报
+            { wvarAdd: { sectAttention: 10 } },
+            { rumorAdd: { t: '今年巡使过镇，没敢在驿馆久留，连夜套了车走了。临走只往仙门方向递了封加急的信。', fame: 1 } },
+            { log: { t: '巡使见了你，扇子都忘了摇。他堆起笑拱手退到一旁：「前辈说笑了，小的这就告退、告退。」', style: '凶' } }
+          ], else: [
+            // 心性尚可：放低姿态招揽，附赠一句仙门情报
+            { cult: 8 },
+            { wvarAdd: { sectAttention: 6 } },
+            { rumorAdd: { t: '驿馆里那位仙门巡使，对着一个凡间后生执起了晚辈礼。茶博士说，活了半辈子没见过这阵仗。', fame: 2 } },
+            { log: { t: '巡使竟起身相迎，换了称呼：「足下早不是池中物了。仙门若有意，小的愿牵这条线——这点门内的脚程火候，先赠足下。」', style: '吉' } }
+          ] } }
+        ],
+        note: '高境界：招揽/上报/退让'
       }
     ]
   });
@@ -1540,6 +1748,76 @@
         { tendAdd: { yinguo: 1 } },
         { log: { t: '散场后他凑过来低声说：「义庄那边近来不干净。你既有些道行，夜里替我留个意。」', style: '凶' } }] }
     ]
+  });
+
+  // ════════════════════════════════════════════════════════════════════
+  // 战后反馈：境界改写「同一胜利」的世界回响（spec §0.5「战后反馈」类）
+  // 同一头狼、同一场胜，凡身是侥幸、引气是高看、炼气是敬畏、筑基是冷处理（习以为常）。
+  // 走 G.sys.social.onCombat（rumor.js 先于本文件加载，安全）；只读玩家 realmIdx 变脸，不涉机制词。
+  // ════════════════════════════════════════════════════════════════════
+  G.sys.social.onCombat(function (p) {
+    if (G.player.dead) return;
+    if (p.result !== 'win') return;
+    if (p.enemyId !== 'yelang' && p.enemyId !== 'yaolang') return;
+    var r = G.player.realmIdx;
+    if (r <= 0) {
+      // 凡身：胜得侥幸，镇上把它当奇闻；老猎户后怕地数落你
+      G.fx([
+        { branch: { cond: { npcAlive: 'lao_liehu' }, then: [
+          { npcFavAdd: { id: 'lao_liehu', n: 2 } },
+          { log: { t: '老猎户听说你空手撂倒了头狼，先是一愣，随即骂你不要命：「下回腿软就跑！命比狼皮金贵。」', style: '世界' } }
+        ], else: [
+          { rumorAdd: { t: '镇上传开了：那个没根脚的后生，居然徒手放倒了一头黑山狼。多半是走了狗运。', fame: 1 } }
+        ] } }
+      ]);
+    } else if (r === 1) {
+      // 引气：刚听见世界的人，赢得有了门道；老猎户高看一眼
+      G.fx([
+        { branch: { cond: { npcAlive: 'lao_liehu' }, then: [
+          { npcFavAdd: { id: 'lao_liehu', n: 3 } },
+          { log: { t: '老猎户摸着你猎狼留下的手法点头：「有路数了。这一年，没白练。」', style: '世界' } }
+        ], else: [
+          { rumorAdd: { t: '猎户行里都说，那后生猎狼的手法一年一个样，像是开了窍。', fame: 1 } }
+        ] } }
+      ]);
+    } else if (r <= 4) {
+      // 炼气：狼已不足为患，胜利化作镇上的敬畏与说书人的段子
+      G.fx([
+        { wvarAdd: { wolfThreat: -2 } },
+        { branch: { cond: { npcAlive: 'shuoshu_ren', pflag: 'shuoshu_bian_shu' }, then: [
+          { rumorAdd: { t: '说书先生又把那位猎狼的事添油加醋讲了一回：「一掌一头狼，黑山的狼见了他绕道走。」', fame: 2 } }
+        ], else: [
+          { rumorAdd: { t: '进山的人都说，如今黑山的狼撞上那位，是它们倒了霉。', fame: 2 } }
+        ] } }
+      ]);
+    } else {
+      // 筑基：青石镇的天象之一，宰头狼如拂尘——世界冷处理，连传闻都懒得起
+      G.fx([
+        { wvarAdd: { wolfThreat: -3 } },
+        { log: { t: '一头狼而已。你随手了结了它，镇上甚至无人再为此惊动——这等事，于你早已不值一提。', style: '平' } }
+      ]);
+    }
+  });
+
+  // 战后反馈：劫道散修——同一场威压跪服，境界越高世界越当作理所当然
+  G.sys.social.onCombat(function (p) {
+    if (G.player.dead) return;
+    if (p.enemyId !== 'sanxiu_jiedao') return;
+    if (p.result !== 'win' && p.result !== 'press') return;
+    var r = G.player.realmIdx;
+    if (r >= 6) {
+      // 筑基：在你面前剪径，是散修自己找死；镇上只当一桩笑谈
+      G.fx([
+        { rumorAdd: { t: '有个不长眼的散修，竟去那位的道上剪径。听说人没敢动手，自己先吓得尿了裤子。', fame: 1 } }
+      ]);
+    } else if (r >= 2) {
+      // 炼气：你已成地方变量，贼人闻名远遁
+      G.fx([
+        { wvarAdd: { villageFear: -1 } },
+        { rumorAdd: { t: '荒山上那伙剪径的，如今一听是那位走的道，宁可绕三十里也不敢拦。', fame: 1 } }
+      ]);
+    }
+    // 引气/凡身：胜得险，无额外回响，留给 social.js 既有的「双手奉还」现场反馈
   });
 
 })();

@@ -66,6 +66,7 @@
       if (!d) { console.warn('[DAO] advance 未知道途:', daoId); return; }
       var st = Math.min(3, (p.daoStage[daoId] || 0) + 1);
       p.daoStage[daoId] = st;
+      p.pflags['_last_advance'] = daoId; // 道心主修判定 tie-break：最近一次纳之的道
       var stageName = (d.stageNames && d.stageNames[st]) || ('第' + st + '境');
       if (st >= 2) {
         // 命名显现：从这一刻起，道名才允许出现在可见文案里
