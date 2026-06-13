@@ -84,6 +84,8 @@ html, body {
   border-radius: 2px;
 }
 .tb-injury { color: var(--cinnabar-bright); font-size: 12px; }
+.tb-pingjing { color: var(--gold); font-weight: bold; animation: pingjing-pulse 1.8s ease-in-out infinite; }
+@keyframes pingjing-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 #sysbar { display: flex; gap: 6px; flex: 0 0 auto; margin-left: 12px; }
 
 /* ===== 主行三栏 ===== */

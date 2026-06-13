@@ -113,6 +113,14 @@
           case 'daoxin':                             // 道心调和效果 {daoxin:{op:'tiaohe',pair}}
             if (v && v.pair) v.pair.forEach(function (d) { ckDao(d, where + '.daoxin'); });
             break;
+          case 'poguan':                             // 破关结算 {poguan:{method, onSucc, onFail}}
+            if (v) {
+              var METHODS = ['wengu', 'jiedan', 'jieshi', 'yamo', 'wudao', 'qiangxing'];
+              if (v.method && METHODS.indexOf(v.method) < 0) warn(where + ' poguan 未知破法:「' + v.method + '」');
+              walkFx(v.onSucc, where + '.poguan.onSucc');
+              walkFx(v.onFail, where + '.poguan.onFail');
+            }
+            break;
         }
       }
     });

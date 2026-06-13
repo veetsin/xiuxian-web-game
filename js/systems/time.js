@@ -73,9 +73,9 @@
       w.season = seasonOf(w.month);
       w.weather = rollWeather(w.season);
 
-      // 7. 道途阈值检查 + 境界突破检查 + 道心冲突结算（杂念/逆冲问心安排）
+      // 7. 道途阈值检查 + 瓶颈征兆（破境改为「契机+破法」事件，见 poguan.js）+ 道心冲突结算
       G.sys.dao.checkProgress();
-      tryBreakthrough();
+      G.sys.poguan.monthly();
       if (p.dead) return;
       G.sys.daoxin.monthly();
       if (p.dead) return;
@@ -149,61 +149,6 @@
       else fallback();
     } else if (w.vars[varId] < resetBelow && w.flags[flagId]) {
       w.flags[flagId] = false;
-    }
-  }
-
-  // ---- 境界突破（契约 §16 公式）：修为攒满自动尝试 ----
-  function tryBreakthrough() {
-    var p = G.player;
-    if (p.realmIdx >= G.BAL.cultNeed.length) return;       // 已是筑基（本界顶）
-    if (p.cult < p.cultNeed) return;
-    var pSucc = 0.9 - p.counters.dandu * 0.004 - p.injury.severity * 0.1 - p.counters.xinmo * 0.003;
-    var conf = G.sys.daoxin.activeConflicts().length;          // 道心逆冲未调和 → 冲关更险
-    if (conf > 0) pSucc -= conf * 0.08;
-    pSucc = G.clamp(pSucc, 0.05, 0.95);
-    if (G.rng.chance(pSucc)) {
-      p.cult -= p.cultNeed;
-      p.realmIdx++;
-      p.cultNeed = p.realmIdx < G.BAL.cultNeed.length ? G.BAL.cultNeed[p.realmIdx] : Infinity;
-      p.lifespan = Math.max(p.lifespan, G.BAL.lifespan[p.realmIdx]);
-      p.maxHp += 14 + p.stats.ti * 2;
-      p.hp = p.maxHp;
-      p.maxQi += 12;
-      p.qi = p.maxQi;
-      var rn = G.IDS.realms[p.realmIdx];
-      G.log('一线灵机自天灵贯入四肢百骸——你踏入了【' + rn + '】。', '突破');
-      G.history('突破至' + rn);
-      G.bus.emit('realm:up', { realmIdx: p.realmIdx });
-      if (p.realmIdx >= 2) {
-        G.sys.rumor.add('听说镇上有人引气入体，走上仙途了。', 3);
-        G.sys.time.setWvar('sectAttention', G.world.vars.sectAttention + 8);
-      }
-    } else {
-      // 道心逆冲未调和时强行冲关 → 两条天理撞作一团，可能走火入魔（spec §3.5 入魔）
-      if (conf > 0 && G.rng.chance(0.15 + conf * 0.1)) {
-        G.log('两条不肯相让的天理在冲关时撞作一团，你的经脉寸寸逆行——走火入魔了。', '凶');
-        G.sys.rein.die('走火入魔');
-        return;
-      }
-      // 走火入魔：心魔深重者强行冲关，魔念可能在识海炸开而致死（命中 mem_death_tupo_shibai）
-      if (p.counters.xinmo >= 50 && G.rng.chance(0.25)) {
-        G.log('你强压心魔冲关，那念头却在识海里炸开——你七窍溢血，再没能起身。', '凶');
-        G.sys.rein.die('tupo_shibai');
-        return;
-      }
-      // 突破失败三种代价：受伤 / 丹毒爆发 / 修为小退
-      var roll = G.rng.int(1, 3);
-      if (roll === 1 || p.counters.dandu < 10) {
-        G.log('灵气走岔，你闷哼一声跌坐于地，喉头泛起血腥。', '凶');
-        G.fx([{ injure: { months: 2, severity: 2 } }]);
-      } else if (roll === 2) {
-        G.log('积年的丹毒在冲关时炸开，你五内如焚。', '丹');
-        G.applyHp(-Math.round(G.player.maxHp * 0.25), '丹毒反噬');
-        p.counters.dandu = Math.max(0, p.counters.dandu - 15);
-      } else {
-        p.cult = Math.max(0, Math.round(p.cult * 0.85));
-        G.log('关隘如铁。气机溃散，数月苦功付诸流水。', '凶');
-      }
     }
   }
 

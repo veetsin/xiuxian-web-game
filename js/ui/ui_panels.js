@@ -12,7 +12,8 @@
       return '<span class="tb-seg' + (cls ? ' ' + cls : '') + '"><span class="tb-label">' + label + '</span>' + val + '</span>';
     }
     var bdef = G.get('birth', p.birthId);
-    var cultText = p.cultNeed === Infinity ? (p.cult + '·圆满') : (p.cult + '/' + p.cultNeed);
+    var atPo = !!(G.sys.poguan && G.sys.poguan.atBottleneck && G.sys.poguan.atBottleneck());
+    var cultText = p.cultNeed === Infinity ? (p.cult + '·圆满') : (atPo ? '气满·关未开' : (p.cult + '/' + p.cultNeed));
     var injuryText = p.injury.severity > 0 ? ('<span class="tb-injury">带伤' + '·'.repeat(p.injury.severity) + '</span>') : '';
     box.innerHTML =
       seg('', '第' + p.lifeIndex + '世', 'tb-life') +
@@ -22,7 +23,7 @@
       seg('寿元', p.ageY + '/' + p.lifespan) +
       seg('气血', p.hp + '/' + p.maxHp + ' ' + injuryText) +
       seg('灵气', p.qi + '/' + p.maxQi) +
-      seg('修为', cultText) +
+      seg('修为', cultText, atPo ? 'tb-pingjing' : '') +
       seg('银两', p.money) +
       seg('名望', p.fame);
   };
