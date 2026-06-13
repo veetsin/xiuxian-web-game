@@ -23,8 +23,75 @@
   // ================= G.debug（契约 §14 全量） =================
   G.debug = {
     _collect: null,
+    _errors: [],
 
     state: function () { return { world: G.world, player: G.player, meta: G.meta }; },
+
+    diagnose: function () {
+      var p = G.player;
+      var blockers = [];
+      if (!p) blockers.push('未入世');
+      else if (p.dead) blockers.push('已死亡');
+      if (G.ui && G.ui.mode === 'birth') blockers.push('出生卡待确认');
+      if (G.ui && G.ui.mode === 'liminal') blockers.push('轮回卡待确认');
+      if (G.combat) blockers.push(G.combat.over ? ('战斗结果未离去：' + G.combat.ename) : ('战斗中：' + G.combat.ename));
+      if (G.sys.events && G.sys.events.pending && G.sys.events.pending.length) blockers.push('待处理事件：' + G.sys.events.pending.length);
+      if (G.paused) blockers.push('队列暂停');
+      if (G.queue && G.queue.length) blockers.push('队列未清：' + G.queue.length);
+      var actions = [];
+      try {
+        actions = G.sys.actions.available().map(function (a) { return a.id + '：' + a.name; });
+      } catch (e) {
+        blockers.push('行动列表异常');
+      }
+      return {
+        mode: G.ui && G.ui.mode,
+        blockers: blockers.length ? blockers : ['无明显阻塞'],
+        location: p ? p.location : null,
+        realm: p ? G.realmName() : null,
+        month: G.world ? G.ymText() : null,
+        actions: actions,
+        pendingEvents: (G.sys.events && G.sys.events.pending) ? G.sys.events.pending.slice() : [],
+        combat: G.combat ? {
+          enemy: G.combat.eid,
+          name: G.combat.ename,
+          over: G.combat.over,
+          result: G.combat.result,
+          rating: G.combat.rating
+        } : null,
+        paused: G.paused,
+        queue: G.queue ? G.queue.length : 0,
+        recentLogs: (G.logBuffer || []).slice(-8),
+        recentErrors: (G.debug._errors || []).slice(-8)
+      };
+    },
+
+    unstick: function () {
+      var notes = [];
+      if (G.combat && G.combat.over) {
+        notes.push('关闭已结束战斗');
+        G.sys.combat.close();
+      } else if (G.combat) {
+        notes.push('切回战斗界面');
+        if (G.ui) G.ui.setMode('combat');
+      }
+      if (!G.combat && G.sys.events && G.sys.events.pending && G.sys.events.pending.length) {
+        notes.push('切回事件选择');
+        if (G.ui) G.ui.setMode('event');
+      }
+      if (G.paused && !G.combat) {
+        notes.push('解除暂停并继续队列');
+        G.paused = false;
+        if (G.pump) G.pump();
+      }
+      if (G.queue && G.queue.length && !G.paused) {
+        notes.push('继续执行队列');
+        G.pump();
+      }
+      if (G.ui && G.ui.refresh) G.ui.refresh();
+      if (!notes.length) notes.push('未发现可自动修复的阻塞');
+      return { notes: notes, diagnose: G.debug.diagnose() };
+    },
 
     give: function (itemId, n) { G.fx([{ itemAdd: { id: itemId, n: n || 1 } }]); G.ui.refresh(); },
     tend: function (daoId, n) { G.fx([{ tendAdd: (function () { var o = {}; o[daoId] = n; return o; })() }]); },

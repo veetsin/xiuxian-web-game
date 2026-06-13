@@ -479,7 +479,10 @@
     var c = G.combat;
     c.over = true; c.result = result; c.rating = rating;
     if (G._autoplay) G.sys.combat.close();
-    else if (G.ui) G.ui.renderCombat(); // 显示战果面板，等玩家点「离去」
+    else if (G.ui) {
+      G.ui.mode = 'combat';
+      G.ui.renderCombat(); // 显示战果面板，等玩家点「离去」
+    }
   }
 
   // 玩家点「离去」（或 autoplay 直接调）：执行战后效果链，恢复主流程

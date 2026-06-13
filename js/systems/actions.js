@@ -10,6 +10,30 @@
   // ---- 执行队列 ----
   G.queue = [];
   G.paused = false;
+  function blockedReason() {
+    var p = G.player;
+    if (!p) return '尚未入世。';
+    if (p.dead) return '此身已死，只待入轮回。';
+    if (G.combat) {
+      if (G.combat.over) {
+        if (G.ui) G.ui.mode = 'combat';
+        return '还有一场战果未收，先点「离去」。';
+      }
+      if (G.ui) G.ui.mode = 'combat';
+      return '刀光剑影未定，先了结眼前这一战。';
+    }
+    if (G.sys.events && G.sys.events.pending && G.sys.events.pending.length) {
+      if (G.ui) G.ui.mode = 'event';
+      return '还有一桩事未决，先作选择。';
+    }
+    return '';
+  }
+  function showBlocked(msg) {
+    if (!msg) return false;
+    if (G.ui && G.ui.refresh) G.ui.refresh();
+    if (G.ui && G.ui.toast) G.ui.toast(msg);
+    return true;
+  }
   G.pump = function () {
     while (!G.paused && G.queue.length) {
       if (G.player && G.player.dead) { G.queue.length = 0; break; }
@@ -38,8 +62,7 @@
 
     // 执行一个主行动（UI / autoplay 入口）
     perform: function (id) {
-      var p = G.player;
-      if (!p || p.dead || G.combat || G.sys.events.pending.length) return false;
+      if (showBlocked(blockedReason())) return false;
       var a = G.get('action', id);
       if (!a) { console.warn('[ACTION] 未知行动:', id); return false; }
 
@@ -80,8 +103,7 @@
 
     // 地图点击移动（不耗月；战斗/事件中禁止）
     travel: function (locId) {
-      var p = G.player;
-      if (!p || p.dead || G.combat || G.sys.events.pending.length) return false;
+      if (showBlocked(blockedReason())) return false;
       var L = G.locState(locId);
       if (!L || !L.discovered || p.location === locId) return false;
       p.location = locId;
@@ -93,7 +115,12 @@
 
     // 行囊使用消耗品（不耗月）。战斗中禁用——嗑药要走战斗指令，不能从背包白嫖回合外治疗。
     useItem: function (itemId) {
-      if (G.combat) { if (G.ui && G.ui.toast) G.ui.toast('刀光剑影里，哪有工夫翻找行囊。'); return false; }
+      var blocked = blockedReason();
+      if (blocked) {
+        if (G.combat && !G.combat.over) blocked = '刀光剑影里，哪有工夫翻找行囊。';
+        showBlocked(blocked);
+        return false;
+      }
       var d = G.get('item', itemId);
       if (!d || d.type !== 'consumable' || G.itemCount(itemId) <= 0) return false;
       if (G.player.dead) return false;
