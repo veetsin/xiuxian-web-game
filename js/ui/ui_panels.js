@@ -35,7 +35,10 @@
     box.innerHTML =
       '<button id="sys-save" class="btn btn-sm">保存</button>' +
       '<button id="sys-load" class="btn btn-sm">读取</button>' +
-      '<button id="sys-restart" class="btn btn-sm btn-danger">重开</button>';
+      '<button id="sys-export" class="btn btn-sm">导出存档</button>' +
+      '<button id="sys-import" class="btn btn-sm">导入存档</button>' +
+      '<button id="sys-restart" class="btn btn-sm btn-danger">重开</button>' +
+      '<input id="sys-import-file" type="file" accept=".json,application/json" style="display:none">';
     document.getElementById('sys-save').onclick = function () {
       if (G.combat) { G.ui.toast('战斗中无法保存。'); return; }
       if (G.player && G.player.dead) { G.ui.toast('此身已死，无可保存。'); return; }
@@ -45,6 +48,26 @@
       if (G.combat) { G.ui.toast('战斗中无法读取。'); return; }
       if (G.save.read()) { G.ui.mode = 'loc'; G.ui.refresh(); G.ui.toast('前缘已续。'); }
       else G.ui.toast('没有可读的存档。');
+    };
+    // 导出存档：当前状态 → JSON 文件下载（纯本地，可长期保存/跨设备迁移）
+    document.getElementById('sys-export').onclick = function () {
+      G.save.exportFile();
+    };
+    // 导入存档：隐藏 file input 选本地 JSON → 校验 → 确认覆盖 → 恢复
+    var importFile = document.getElementById('sys-import-file');
+    document.getElementById('sys-import').onclick = function () {
+      if (G.combat) { G.ui.toast('战斗中无法导入。'); return; }
+      if (G.player && G.player.dead) { G.ui.toast('此身已死，导入请先重开后再试。'); return; }
+      importFile.value = ''; // 清空，允许连选同一文件
+      importFile.click();
+    };
+    importFile.onchange = function () {
+      var f = importFile.files && importFile.files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function () { G.save.importFromText(String(reader.result)); };
+      reader.onerror = function () { G.ui.toast('读取文件失败。'); G.log('导入失败：文件读取出错。', '凶'); };
+      reader.readAsText(f);
     };
     document.getElementById('sys-restart').onclick = function () {
       G.ui.confirmBox('重开将抹去全部存档与轮回记忆，从混沌中另起一局。此举不可挽回。', function () {
