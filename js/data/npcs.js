@@ -139,6 +139,38 @@
           { log: { t: '老猎户摩挲着那把卷了刃的猎刀，半晌才开口：「我这把老骨头，压不住黑山了。这山……往后托给你，行么？」', style: '世界' } }
         ],
         note: '炼气后期：请你护山'
+      },
+      // ── 余痕（spec §0.6 表 NPC 列）：老猎户一辈子看兽踪，看人也看「命数里的偏向」，不是记得你 ──
+      { // 血剑道痕：他闻得出你身上那股「见过血、收过命」的气，态度提前转——教得更狠，也更早把你当条汉子
+        cond: { daohen: { id: 'xuejian', gte: 5 }, realm: { lte: 1 }, nopflag: 'yh_liehu_xuejian' },
+        chance: 0.3,
+        effects: [
+          { pflagSet: { id: 'yh_liehu_xuejian' } },
+          { npcFavAdd: { id: 'lao_liehu', n: 5 } },
+          { log: { t: '老猎户头一回见你，眯眼上下打量了好一阵，递过来半块风干的鹿脯，没头没脑地说：「你这小子，眼里有股劲。山里见过血的人才是这眼神——别问我咋知道。」', style: '世界' } }
+        ],
+        note: '余痕·血剑：闻出你像见过血'
+      },
+      { // 兽魂道痕：他总觉得你身后跟着点什么，狗见你不叫，山雀落你肩头——他说不上来，只是莫名信你
+        cond: { daohen: { id: 'shouhun', gte: 5 }, nopflag: 'yh_liehu_shouhun' },
+        chance: 0.3,
+        effects: [
+          { pflagSet: { id: 'yh_liehu_shouhun' } },
+          { npcFavAdd: { id: 'lao_liehu', n: 6 } },
+          { itemAdd: { id: 'shougu_hufu', n: 1 } },
+          { log: { t: '老猎户家那条见谁都呲牙的老黄狗，头一回冲生人摇了尾巴，绕着你的腿转。老头愣了愣，把磨了一半的兽骨符塞进你手里：「畜生比人识人。它认你……那我也认你。」', style: '吉' } }
+        ],
+        note: '余痕·兽魂：畜生认你，老人莫名信你'
+      },
+      { // 称号残响：高境界前世名动一方，老人记不清在哪听过你，只觉这影子眼熟——「听过这个影子」
+        cond: { echo: true, nopflag: 'yh_liehu_echo' },
+        chance: 0.25,
+        effects: [
+          { pflagSet: { id: 'yh_liehu_echo' } },
+          { npcFavAdd: { id: 'lao_liehu', n: 4 } },
+          { log: { t: '老猎户盯着你看了半晌，猎刀都忘了磨：「怪事。你这模样，我分明没见过，可这名字……我像是在哪个雪夜，听打山外来的人念叨过一耳朵。」他摇摇头，「老糊涂了。」', style: '世界' } }
+        ],
+        note: '余痕·残响：听过这个影子'
       }
     ]
   });
@@ -301,6 +333,29 @@
           { log: { t: '掌柜的颤巍巍捧出一只油布包：「回春堂祖上传下的半张残方，老朽参不透。你是要登天的人——这一注，老朽押你。」', style: '丹' } }
         ],
         note: '筑基：拿祖传残方赌一次'
+      },
+      // ── 余痕（spec §0.6 表 NPC 列）：掌柜称了一辈子药，看人辨气也准；他不是记得你，是看出你命数里的偏向 ──
+      { // 丹药道痕：你头一回进店，他随口考你几味药，你答得太顺——他便提前试探、给熟客价
+        cond: { daohen: { id: 'danyao', gte: 5 }, realm: { lte: 1 }, nopflag: 'yh_laoban_danyao' },
+        chance: 0.35,
+        effects: [
+          { pflagSet: { id: 'yh_laoban_danyao' } },
+          { npcFavAdd: { id: 'yaopu_laoban', n: 6 } },
+          { itemAdd: { id: 'dihui_tang', n: 1 } },
+          { log: { t: '掌柜的随手拈起柜上三味药考你，你想都没想就分了出来。他算盘一停，重新打量你：「你这手……不像头回辨药的人。」话到嘴边的「在哪学的」咽了回去，只把一罐私汤往你这边推了推。', style: '丹' } }
+        ],
+        note: '余痕·丹药：辨药像老手，提前试探'
+      },
+      { // 寒冰/寒毒道痕：他号脉时觉得你气血偏冷、腕底比常人凉一截，莫名嘱你一句、赠一味暖药
+        cond: { daohen: { id: 'handu', gte: 5 }, realm: { lte: 2 }, nopflag: 'yh_laoban_handu' },
+        chance: 0.3,
+        effects: [
+          { pflagSet: { id: 'yh_laoban_handu' } },
+          { npcFavAdd: { id: 'yaopu_laoban', n: 4 } },
+          { itemAdd: { id: 'dihui_tang', n: 1 } },
+          { log: { t: '掌柜的搭你腕脉抓药，眉头一拧：「怪了，你这腕子底下，凉得不像活人的血。」他翻出一味暖性的药材塞给你，没要钱：「煎了喝。后生家，别让寒气在身子里扎了根——我瞧着你这底子，最招它。」', style: '丹' } }
+        ],
+        note: '余痕·寒冰：气血偏冷，莫名嘱药'
       }
     ]
   });
@@ -461,6 +516,28 @@
           { rumorAdd: { t: '大师兄不告而别。临走撂下一句：「这镇子，已经容不下两条龙了。」听的人不知他指谁。', fame: 0 } }
         ],
         note: '你超过他后：嫉妒离镇'
+      },
+      // ── 余痕（spec §0.6 表 NPC 列）：武馆人凭一双手摸料，他不记得你，只摸出你筋骨里那股「站得住」的底子 ──
+      { // 炼体道痕：你一进武馆，他一搭你肩、一掂你腕，就知你「站得住」——破例放低姿态，主动招你切磋
+        cond: { daohen: { id: 'lianti', gte: 5 }, noflag: 'dashixiong_li_guan', nopflag: 'yh_dsx_lianti' },
+        chance: 0.3,
+        effects: [
+          { pflagSet: { id: 'yh_dsx_lianti' } },
+          { npcFavAdd: { id: 'dashixiong', n: 6 } },
+          { statAdd: { li: 1 } },
+          { log: { t: '大师兄本没拿你当回事，路过随手一搭你的肩，脚下却顿了顿。他攥了攥你的小臂，眉头一挑：「下盘扎得住啊。」破天荒拱了拱手：「来，走两趟。我倒想看看你这身板是怎么练出来的。」', style: '体' } }
+        ],
+        note: '余痕·炼体：摸出你站得住，主动切磋'
+      },
+      { // 血剑道痕：他对着你练拳时，总觉你出手太狠、收手太利落，不像没杀过东西的人——莫名忌惮三分
+        cond: { daohen: { id: 'xuejian', gte: 5 }, noflag: 'dashixiong_li_guan', nopflag: 'yh_dsx_xuejian' },
+        chance: 0.25,
+        effects: [
+          { pflagSet: { id: 'yh_dsx_xuejian' } },
+          { npcFavAdd: { id: 'dashixiong', n: 2 } },
+          { log: { t: '过手时你随手一格，大师兄忽然收了拳，盯着你看了两息。他不知怎么的退了半步：「你这手……起势就奔着要害去。寻常人练不出这股子杀劲。」他没再往下说，那一趟拳，他打得比平日认真。', style: '体' } }
+        ],
+        note: '余痕·血剑：嗅出杀劲，莫名忌惮'
       }
     ]
   });
@@ -587,6 +664,28 @@
           { log: { t: '庙祝枯手攥住你的袖子，眼里头一回有了惧色：「后殿那扇门，我压不住了。你身上有香火，替我守一守这庙……求你了。」', style: '因果' } }
         ],
         note: '炼气后期：求你镇庙'
+      },
+      // ── 余痕（spec §0.6 表 NPC 列）：庙祝自己也半通阴阳，对雷法、旧债的偏向比常人敏感——不是记得你，是看见你命里那点同样的东西 ──
+      { // 雷法道痕：逢雷雨夜，他对你格外不自在，给你一句「不该给的提醒」——莫名忌惮三分
+        cond: { daohen: { id: 'leifa', gte: 5 }, weather: '雷雨', noflag: 'miaozhu_shizong', nopflag: 'yh_miaozhu_leifa' },
+        chance: 0.5,
+        effects: [
+          { pflagSet: { id: 'yh_miaozhu_leifa' } },
+          { counterAdd: { xinmo: -1 } },
+          { log: { t: '雷雨夜你进庙避雨，庙祝盯着檐外的闪电，又回头看你，脸色发白：「今夜的雷，绕着这庙走，却像在找你似的。」他犹豫再三，压低声说了句本不该对生人说的话：「后殿那道门，雷响时别靠近——它怕雷，可它也认得引雷的人。」', style: '因果' } }
+        ],
+        note: '余痕·雷法：雷雨夜敏感，给不该给的提醒'
+      },
+      { // 因果道痕：他觉得你像背着一笔旧账进的庙，神像前的香火冲你这边偏——他莫名想替你还点什么
+        cond: { daohen: { id: 'yinguo', gte: 5 }, noflag: 'miaozhu_shizong', nopflag: 'yh_miaozhu_yinguo' },
+        chance: 0.3,
+        effects: [
+          { pflagSet: { id: 'yh_miaozhu_yinguo' } },
+          { npcFavAdd: { id: 'miaozhu', n: 4 } },
+          { itemAdd: { id: 'fuzhi', n: 1 } },
+          { log: { t: '你在神像前一站，那炷香的烟无端往你这边斜了斜。庙祝瞧着，叹了口气，递来一道朱砂符：「后生，你这身上像压着笔没了的旧账。我说不上是什么——但欠下的，迟早要还。这符，你拿着，遇上叫你名字的，别认。」', style: '因果' } }
+        ],
+        note: '余痕·因果：像背着旧账，香火偏向你'
       }
     ]
   });
@@ -716,6 +815,28 @@
           ] } }
         ],
         note: '高境界：招揽/上报/退让'
+      },
+      // ── 余痕（spec §0.6 表 NPC 列）：巡使自己也修行，看人先看命数的偏向；不是记得你，是看见你命里那一脉同样的东西 ──
+      { // 雷法道痕：他过镇那夜恰逢雷雨，扇骨一指你，眼神变了——对引雷的命格格外敏感，留下一句意味深长的话
+        cond: { monthIn: [9], weather: '雷雨', daohen: { id: 'leifa', gte: 5 }, nopflag: 'yh_xunshi_leifa' },
+        chance: 0.6,
+        effects: [
+          { pflagSet: { id: 'yh_xunshi_leifa' } },
+          { npcFavAdd: { id: 'waimen_xunshi', n: 4 } },
+          { wvarAdd: { sectAttention: 3 } },
+          { log: { t: '九月这场雷雨来得蹊跷。巡使立在驿馆檐下，本没正眼瞧你，一道惊雷劈下时，他扇骨忽地一顿，回头打量你的眼神变了：「足下站在这雷地里，竟一点都不躲。」他若有所思，「这天上的东西，认人。你命里……是沾过它的。」', style: '异象' } }
+        ],
+        note: '余痕·雷法：雷雨夜，巡使对引雷命格敏感'
+      },
+      { // 称号残响：前世名动一方，这老于世故的巡使总觉你眼熟、名号耳熟——「听过这个影子」
+        cond: { monthIn: [9], echo: true, nopflag: 'yh_xunshi_echo' },
+        chance: 0.4,
+        effects: [
+          { pflagSet: { id: 'yh_xunshi_echo' } },
+          { npcFavAdd: { id: 'waimen_xunshi', n: 3 } },
+          { rumorAdd: { t: '驿馆那位巡使打听了你的名姓，听完扇子摇得慢了：「这名号……我像在哪本仙门旧册上扫过一眼。」茶博士说他坐着出了好一会儿神。', fame: 1 } }
+        ],
+        note: '余痕·残响：仙门人也觉你名号耳熟'
       }
     ]
   });
@@ -1128,6 +1249,19 @@
           { log: { t: '狐婆摩挲着你的脸，浑浊的眼里落下泪来：「我的儿……总算又回坳里来了。」', style: '平' } }
         ],
         note: '狐养儿归坳，认亲'
+      },
+      // ── 余痕（spec §0.6 表 NPC 列）：狐婆本就是狐，闻得出你身上那点似真似假的「假味」——她不是记得你，是认得你命里那一脉狐缘 ──
+      { // 狐魅道痕：你一进坳，几只狐先围了上来；她眯眼笑你身上那点「人不像人」的味道，破例点拨一句
+        cond: { daohen: { id: 'humei', gte: 5 }, npcFav: { id: 'hupo', gte: 10 },
+          bossAlive: 'laohu_xian', not: { legacy: 'hu_an_jing' }, nopflag: 'yh_hupo_humei' },
+        chance: 0.4,
+        effects: [
+          { pflagSet: { id: 'yh_hupo_humei' } },
+          { npcFavAdd: { id: 'hupo', n: 8 } },
+          { itemAdd: { id: 'hu_meifen', n: 1 } },
+          { log: { t: '你才进坳，几只油亮的狐就绕到你脚边，蹭着不肯走。狐婆拄杖咯咯地笑：「它们这是认味呢。你这后生，骨子里挂着一缕跟我们一样的假味——笑着的时候，心是冷的吧？」她捻了撮香粉塞你手里，「同路人，拿着。」', style: '异象' } }
+        ],
+        note: '余痕·狐魅：狐认你的假味，破例点拨'
       }
     ]
   });
@@ -1261,6 +1395,18 @@
           { rumorAdd: { t: '断剑崖下三年冷的炉子又烧起来了。老铸匠逢人就笑：「我那些剑，总算有人替它们等到了主。」', fame: 0 } }
         ],
         note: '剑冢认主，老人开炉'
+      },
+      // ── 余痕（spec §0.6 表 NPC 列）：铸剑老人一辈子听剑，听人也听那点剑意；他不是记得你，是听见你命里那一脉曾握过剑 ──
+      { // 御剑道痕：你头一回到崖下，他便觉你「手里有剑」——崖根那截断剑无端冲你响，老人破例塞剑相试
+        cond: { daohen: { id: 'yujian', gte: 5 }, bossAlive: 'jianzhong_jianling', nopflag: 'yh_zjw_yujian' },
+        chance: 0.4,
+        effects: [
+          { pflagSet: { id: 'yh_zjw_yujian' } },
+          { npcFavAdd: { id: 'zhujian_weng', n: 6 } },
+          { itemAdd: { id: 'duan_jian', n: 1 } },
+          { log: { t: '你刚走到崖下，乱石堆里一截锈断剑忽然嗡地一颤，像应着谁。老人猛地直起腰，盯住你的手：「怪了……你这两手空空，崖上的剑却冲你叫。」他从石缝里拣出那截断锋塞给你：「拿着。手里曾经有过剑的人，剑记得——别问我怎么看出来的。」', style: '异象' } }
+        ],
+        note: '余痕·御剑：剑冲你响，老人觉你手里有剑'
       }
     ]
   });
@@ -1350,6 +1496,19 @@
           { log: { t: '河婆把祭河的香谱手把手教你：「敬它的不是供品，是这一炷不歪的心。」', style: '因果' } }
         ],
         note: '授香火祭法'
+      },
+      // ── 余痕（spec §0.6 表 NPC 列）：河婆守了一辈子香火，看人先看心头那炷愿；她不是记得你，是看见你命里那一脉不歪的香火 ──
+      { // 香火道痕：你头一回上渡口，她就觉你这人「托得住事」，无端把一桩愿债交到你手上
+        cond: { daohen: { id: 'xianghuo', gte: 5 }, npcFav: { id: 'heshen_po', gte: 10 },
+          not: { legacy: 'heshen_ping' }, nopflag: 'yh_heshen_xianghuo' },
+        chance: 0.4,
+        effects: [
+          { pflagSet: { id: 'yh_heshen_xianghuo' } },
+          { npcFavAdd: { id: 'heshen_po', n: 8 } },
+          { itemAdd: { id: 'xiang_zhu', n: 2 } },
+          { log: { t: '河婆撑你过河，撑到一半忽然不撑了，回头打量你：「后生，你点香的手，稳。」她把一对红烛塞进你怀里，没头没脑托付道：「渡口西头沉了个没还愿的客死鬼，三年没人替他烧炷香。我瞧着你……是个托得住的人。得空替他点一炷，行么？」', style: '因果' } }
+        ],
+        note: '余痕·香火：托得住事，无端托付愿债'
       }
     ]
   });
@@ -1719,6 +1878,27 @@
           { log: { t: '说书先生本想编你的段子，搁下惊堂木又作罢：「那位的事……还是少说为妙。」', style: '凶' } }
         ],
         note: '惧煞气，闭口避祸'
+      },
+      // ── 余痕（spec §0.6 表 NPC 列）：说书人攒了一肚子旧段子，最容易把称号残响错认成「以前听过的老话本」——「听过这个影子」 ──
+      { // 称号残响（泛）：你名头还没起，他却觉你眼熟，像他压箱底某个讲了一半就散了的老段子里的人
+        cond: { echo: true, fame: { lte: 30 }, nopflag: 'yh_shuoshu_echo' },
+        chance: 0.4,
+        effects: [
+          { pflagSet: { id: 'yh_shuoshu_echo' } },
+          { fame: 2 },
+          { rumorAdd: { t: '茶肆的说书先生瞧着角落里那个还没名头的后生，惊堂木悬在半空落不下去：「这位客官，我怎么瞧着面善？倒像我爷爷那辈传下来、却没人讲全的一段老话本里的人……」满座听客都回头看你，你自己也愣住了。', fame: 0 } }
+        ],
+        note: '余痕·残响（泛）：说书人把你错认成老话本里的人'
+      },
+      { // 称号残响（具）：你前世曾得「血夜煞神」这等狠名，残响落到话本里成了一个吓小儿的影子，他讲到一半莫名忌惮
+        cond: { echo: 'xueye_shashen', nopflag: 'yh_shuoshu_xueshen' },
+        chance: 0.45,
+        effects: [
+          { pflagSet: { id: 'yh_shuoshu_xueshen' } },
+          { counterAdd: { xinmo: 1 } },
+          { rumorAdd: { t: '说书先生新起了个吓人的段子，讲一个血夜里提刀的影子。讲到那影子转过脸来，他眼角余光扫见座中的你，声音莫名一抖，草草收了场：「……这段，邪性，不讲了。」散场后他绕着你走。', fame: 0 } }
+        ],
+        note: '余痕·残响（血夜杀神）：话本里的影子，说书人莫名忌惮'
       }
     ]
   });

@@ -40,7 +40,8 @@
         case 'loc': ckLoc(v, where); break;
         case 'wvar': ckWvar(v.id, where); break;
         case 'locvar': ckLoc(v.loc, where); break;
-        case 'tend': case 'daoStage': ckDao(v.id, where); break;
+        case 'tend': case 'daoStage': case 'daohen': ckDao(v.id, where); break; // daohen=前世道痕
+        case 'echo': if (v !== true) ck('title', v, where); break;             // 称号残响
         case 'stat': if (G.IDS.stats.indexOf(v.id) < 0) warn(where + ' 未知属性:' + v.id); break;
         case 'counter': if (G.IDS.counters.indexOf(v.id) < 0) warn(where + ' 未知累积量:' + v.id); break;
         case 'kills': ck('enemy', v.id, where); break;

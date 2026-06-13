@@ -217,9 +217,21 @@
       html += '<div class="qs-death">前世终于' + (locDef ? esc(locDef.name) : '不知名处') +
         '（' + m.lastDeath.ym.y + '年' + m.lastDeath.ym.m + '月）。</div>';
     }
+    // 道途余痕（spec §0.6）：前世走过的道，在命数里留下的偏向（不是修为，是「似曾相识」的根）
+    var seed = m.carried.tendSeed || {};
+    var hen = G.all('dao').filter(function (d) { return (seed[d.id] || 0) > 0; })
+      .sort(function (a, b) { return (seed[b.id] || 0) - (seed[a.id] || 0); });
     var mems = p.memories.map(function (id) { return G.get('memory', id); }).filter(Boolean);
-    if (!mems.length && !m.carried.echoes.length) {
+    if (!mems.length && !m.carried.echoes.length && !hen.length) {
       return html + '<div class="side-empty">没有前尘可忆。第一世的人，干干净净。</div>';
+    }
+    if (hen.length) {
+      html += '<div class="qs-group">道途余痕</div>';
+      hen.forEach(function (d) {
+        var s = seed[d.id] || 0;
+        var deg = s >= 14 ? '命数里深深刻着' : s >= 7 ? '命数里留着' : '命数里隐约还有';
+        html += '<div class="qs-echo">' + deg + '一缕' + esc(d.hiddenName) + '的偏向——身边的人、物、兽，有时会无端对你这股气有反应。</div>';
+      });
     }
     var groups = { death: '殒身之忆', intel: '深藏之识', chance: '机缘之念', misc: '残篇' };
     Object.keys(groups).forEach(function (kind) {

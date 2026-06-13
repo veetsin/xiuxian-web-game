@@ -88,6 +88,14 @@
         case 'pflag': ok = Array.isArray(v) ? v.every(function (x) { return !!p.pflags[x]; }) : !!p.pflags[v]; break;
         case 'nopflag': ok = Array.isArray(v) ? v.every(function (x) { return !p.pflags[x]; }) : !p.pflags[v]; break;
         case 'legacy': ok = !!(G.meta && G.meta.legacy[v]); break;
+        // 道途余痕（spec §0.6）：前世道痕（carried.tendSeed，命数偏向，跨世留存且本世内不变），
+        //   用于让 NPC/世界/敌人/异兽对你「似曾相识」。{daohen:{id:'leifa', gte:5}}
+        case 'daohen': ok = cmp(num((G.meta && G.meta.carried && G.meta.carried.tendSeed || {})[v.id]), v); break;
+        // 称号残响：前世名声。{echo:'titleId'}（曾得该称号）或 {echo:true}（曾名动一方）
+        case 'echo': {
+          var ec = (G.meta && G.meta.carried && G.meta.carried.echoes) || [];
+          ok = (v === true) ? ec.length > 0 : ec.some(function (e) { return e.title === v; });
+        } break;
         case 'tend': ok = cmp(num(p.tend[v.id]), v); break;
         case 'daoStage': ok = cmp(num(p.daoStage[v.id]), v); break;
         case 'stat': ok = cmp(num(p.stats[v.id]), v); break;
