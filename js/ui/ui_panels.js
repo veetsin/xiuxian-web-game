@@ -64,10 +64,7 @@
       var st = w.locations[id];
       var def = G.get('location', id);
       if (!st || !def) return;
-      if (!st.discovered) {
-        html += '<div class="map-item map-unknown">〔未知之地〕</div>';
-        return;
-      }
+      if (!st.discovered) return; // 未触发的地点完全不显示，不泄露存在/数量/次序
       var cur = p.location === id;
       var dangerDots = '';
       var lvl = Math.min(5, Math.ceil(st.danger / 20));

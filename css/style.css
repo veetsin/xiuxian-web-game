@@ -111,8 +111,6 @@ html, body {
 }
 .map-item:hover { border-color: var(--gold); background: rgba(201, 162, 39, 0.06); }
 .map-cur { border-color: var(--cinnabar); background: rgba(176, 58, 46, 0.1); }
-.map-unknown { color: var(--paper-faint); cursor: default; text-align: center; letter-spacing: 2px; }
-.map-unknown:hover { border-color: var(--line-soft); background: rgba(0, 0, 0, 0.15); }
 .map-name { letter-spacing: 1px; }
 .map-here {
   float: right; font-size: 11px; color: var(--cinnabar-bright);
