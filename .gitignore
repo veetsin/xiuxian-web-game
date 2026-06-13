@@ -4,8 +4,15 @@
 *.log
 Thumbs.db
 
-# 开发期测试脚本（保留 harness.js，剔除探针残留）
-tools/_probe_*.js
+# 设计文档 / 开发工具：只留本地，绝不进公开仓库。
+# 公开仓库只含游戏本体：index.html / css / js / README.md / .gitignore。
+# 即便误用 `git add .`，下列内容也会被忽略，不会被加入提交。
+docs/
+tools/
+AGENT_CONTRACT.md
+xiuxian_horizontal_expansion_spec.md
+*_spec.md
+*_SPEC.md
 
 # Node（本项目零依赖，仅防御）
 node_modules/
