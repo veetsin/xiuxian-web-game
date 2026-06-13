@@ -57,6 +57,9 @@
       // 4. NPC 月度行动
       G.sys.npc.monthly();
       if (p.dead) return;
+      // 4.5 驭兽月度（兽自发小事件：带猎/示警/闹脾气/老去，见 beast.js）
+      G.sys.beast.monthly();
+      if (p.dead) return;
 
       // 5. 世界变量漂移 + 阈值检查
       drift();

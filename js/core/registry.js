@@ -2,7 +2,7 @@
 // kind ∈ item | birth | memory | location | action | event | enemy | dao | npc | title
 (function () {
   'use strict';
-  G.KINDS = ['item', 'birth', 'memory', 'location', 'action', 'event', 'enemy', 'dao', 'npc', 'title'];
+  G.KINDS = ['item', 'birth', 'memory', 'location', 'action', 'event', 'enemy', 'dao', 'npc', 'title', 'beastlore'];
   G._reg = {};
 
   G.define = function (kind, def) {

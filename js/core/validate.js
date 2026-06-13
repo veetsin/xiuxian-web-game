@@ -53,6 +53,7 @@
         case 'bossAlive': case 'bossDead': ck('enemy', v, where); break;
         case 'season': if (G.IDS.seasons.indexOf(v) < 0) warn(where + ' 未知季节:' + v); break;
         case 'weather': if (G.IDS.weathers.indexOf(v) < 0) warn(where + ' 未知天气:' + v); break;
+        case 'pet': if (v && v.species) ck('beastlore', v.species, where + '.pet'); break; // 驭兽条件
       }
     }
   }
@@ -98,6 +99,9 @@
             break;
           case 'insight':
             if (!v.id) warn(where + ' insight 缺少 id');
+            break;
+          case 'pet':                                // 驭兽效果（单一 op，{pet:{op:'...'}}）
+            if (v && v.species) ck('beastlore', v.species, where + '.pet'); // gain 的物种引用
             break;
         }
       }
@@ -227,6 +231,18 @@
         });
       }
       if (d.defeatCause) ck('enemy', d.defeatCause, W + '.defeatCause'); // 战败记忆（nonLethal 强敌）
+    });
+
+    // 异兽志（beastlore，驭兽系统物种谱；schema 见 beast.js 文件头 §E）
+    var TRACKS = ['温灵', '野凶'], RANKS = ['凡', '下', '中', '上', '玄'], STAGES = ['通灵', '灵兽', '化形'];
+    G.all('beastlore').forEach(function (d) {
+      var W = 'beastlore/' + d.id;
+      if (!d.name) warn(W + ' 缺 name');
+      if (TRACKS.indexOf(d.track) < 0) warn(W + ' 非法 track:「' + d.track + '」(须 温灵/野凶)');
+      if (RANKS.indexOf(d.rank) < 0) warn(W + ' 非法 rank:「' + d.rank + '」(须 凡/下/中/上/玄)');
+      if (!d.omen || typeof d.omen !== 'object') warn(W + ' 缺 omen 三阶异象');
+      else STAGES.forEach(function (s) { if (!d.omen[s]) warn(W + ' omen 缺「' + s + '」阶异象文案'); });
+      (d.habitat || []).forEach(function (lid) { ckLoc(lid, W + '.habitat'); });
     });
 
     console.log('[VALIDATE] done, ' + issues + ' issues');

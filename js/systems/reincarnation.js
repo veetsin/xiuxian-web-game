@@ -140,6 +140,8 @@
       applyLegacy();
 
       // 新玩家：lifeIndex、tendSeed、携带记忆/悟道录
+      // 驭兽（契约 §G）：newPlayer 已置 pet:null，兽留在上一世；命缘兽死的转世认主
+      // 走 legacy 'pet_zhuanshi' + meta.carried.petSoul，由来世「梦引而至」事件 {pet:{op:'gainSoul'}} 重建。
       G.player = G.newPlayer();
       G.player.lifeIndex = G.meta.reincarnationCount + 1;
       var seed = G.meta.carried.tendSeed;

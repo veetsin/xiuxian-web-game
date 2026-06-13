@@ -78,6 +78,7 @@
       memories: [], titles: [], pflags: {},
       injury: { months: 0, severity: 0 },
       location: 'qingshizhen',
+      pet: null,             // 驭兽系统：null=无兽。数据形见 js/systems/beast.js 文件头 §A
       dead: false
     };
   };

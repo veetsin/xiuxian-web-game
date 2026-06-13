@@ -156,10 +156,11 @@
     });
   };
 
-  // ================= 侧栏六 tab =================
+  // ================= 侧栏 tab =================
   var TABS = [
     ['wudao', '悟道录'], ['qianshi', '前世'], ['chuanwen', '传闻'],
-    ['chenghao', '称号'], ['xingnang', '行囊'], ['renwu', '人物']
+    ['chenghao', '称号'], ['xingnang', '行囊'], ['renwu', '人物'],
+    ['lingshou', '灵兽']
   ];
 
   G.ui.renderSide = function () {
@@ -174,7 +175,8 @@
     });
     var fn = {
       wudao: tabWudao, qianshi: tabQianshi, chuanwen: tabChuanwen,
-      chenghao: tabChenghao, xingnang: tabXingnang, renwu: tabRenwu
+      chenghao: tabChenghao, xingnang: tabXingnang, renwu: tabRenwu,
+      lingshou: tabLingshou
     }[G.ui.tab] || tabWudao;
     body.innerHTML = fn();
     bindSideEvents(body);
@@ -288,6 +290,79 @@
         '<div class="npc-desc">' + esc(d.desc || '') + '</div></div>';
     });
     return html || '<div class="side-empty">你还不认得什么人。</div>';
+  }
+
+  // 灵兽：当前兽（全出词·零数字） + 异兽志（见过的灵物）
+  // mood → 一句感受话（不出机制词）
+  var PET_MOOD_WORD = {
+    '安': '神态安泰', '躁': '焦躁难安', '伤': '带着伤',
+    '病': '气息恹恹', '恋主': '寸步不离你', '将老': '毛色见衰，老态渐生'
+  };
+  // 印记 id → 可读异象词（marks 为机制 token，UI 只出词）
+  var PET_MARK_WORD = { 'xue_ran': '染煞' };
+  function markWord(m) { return PET_MARK_WORD[m] || m; }
+
+  function tabLingshou() {
+    var beast = G.sys.beast;
+    var pet = G.pet();
+    var html = '';
+
+    if (pet) {
+      var d = beast.def(pet);
+      var speciesName = d ? d.name : '不知名的灵物';
+      // 名 + 物种 + 阶段 + 态度，仿人物/悟道录卡片风
+      html += '<div class="npc-item">' +
+        '<div class="npc-name">' + esc(pet.name || speciesName) +
+        '<span class="npc-fav">' + esc(beast.bondWord(pet) || '生分') + '</span></div>' +
+        '<div class="npc-desc">' + esc(speciesName) + ' · ' +
+        esc(beast.spiritName(pet) || '野性') + ' · ' + esc(pet.track || '') + '</div>';
+
+      // 当前心绪
+      html += '<div class="wd-line">此刻：' + esc(PET_MOOD_WORD[pet.mood] || pet.mood || '安') + '</div>';
+
+      // 性情
+      if (pet.temper && pet.temper.length) {
+        html += '<div class="inv-traits">性情：' + pet.temper.map(esc).join('、') + '</div>';
+      }
+      // 职能（觉醒之能）
+      if (pet.duty && pet.duty.length) {
+        html += '<div class="inv-traits">通晓：' + pet.duty.map(esc).join('、') + '</div>';
+      }
+      // 印记
+      if (pet.marks && pet.marks.length) {
+        html += '<div class="inv-traits">印记：' + pet.marks.map(function (m) { return esc(markWord(m)); }).join('、') + '</div>';
+      }
+      html += '</div>';
+
+      // 它记得的事
+      if (pet.memory && pet.memory.length) {
+        html += '<div class="panel-title">它记得的事</div>';
+        pet.memory.forEach(function (t) {
+          html += '<div class="qs-mem"><div class="qs-text">' + esc(t) + '</div></div>';
+        });
+      }
+    } else {
+      html += '<div class="side-empty">你身边还没有相伴的灵物。</div>';
+    }
+
+    // 异兽志：见过的灵物（不做集齐进度/百分比）
+    var seenIds = beast.seen ? beast.seen() : [];
+    html += '<div class="panel-title">异兽志</div>';
+    if (seenIds.length) {
+      seenIds.forEach(function (id) {
+        var ld = G.get('beastlore', id);
+        if (!ld) return;
+        var rankText = ld.rank ? ld.rank + '阶' : '';
+        html += '<div class="npc-item"><div class="npc-name">' + esc(ld.name) +
+          (rankText ? '<span class="npc-fav">' + esc(rankText) + '</span>' : '') + '</div>' +
+          '<div class="npc-desc">' + esc((ld.track || '') + (ld.catchHints ? ' · ' + ld.catchHints : '')) + '</div></div>';
+      });
+      html += '<div class="wd-line">江湖上还有没见过的灵物。</div>';
+    } else {
+      html += '<div class="side-empty">江湖上还有没见过的灵物。</div>';
+    }
+
+    return html;
   }
 
   function bindSideEvents(body) {
