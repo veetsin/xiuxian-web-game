@@ -1,0 +1,12 @@
+# 本地开发 / 编辑器
+.claude/
+.DS_Store
+*.log
+Thumbs.db
+
+# 开发期测试脚本（保留 harness.js，剔除探针残留）
+tools/_probe_*.js
+
+# Node（本项目零依赖，仅防御）
+node_modules/
+npm-debug.log*
