@@ -2415,7 +2415,52 @@
           { hp: -8 },
           { counterAdd: { xinmo: -2 } },
           { log: { t: '你在水里合掌许下重愿。缠脚的手忽然一松——河神，记下了这笔愿。', style: '因果' } },
-          { eventDelay: { id: 'ev_heshen_zaoyu', months: 3, note: '欠了河神一个愿' } }
+          // 改用 location-agnostic 的「河神讨愿」专用钩（不再借挂 loc 的「渡口涨水」，杜绝失效剧情）；
+          // 半年后水起时来讨，正落入中段钩。
+          { eventDelay: { id: 'ev_heshen_taoyuan', months: 6, note: '欠了河神一个愿，半年后水起时来讨' } }
+        ] }]
+      }
+    ]
+  });
+
+  // 河神讨愿 —— 「向河神许愿求生」后的债务回收钩。location-agnostic：河婆／水孩子寻你而来，
+  //   无论你身在何处都能触发，且兼容河婆已亡（换水孩子捎话）。拖欠则债不消、河神再来讨，
+  //   心魔与镇恐慌随之累积——河神的愿，是要还的。
+  G.define('event', {
+    id: 'ev_heshen_taoyuan', title: '河神讨愿',
+    queueOnly: true, baseWeight: 0,
+    tags: ['渡', '水', '香火', '因果'],
+    textFn: function () {
+      var here = (G.get('location', G.player.location) || {}).name || '路上';
+      var tuo = G.player.pflags['heshen_yuan_tuo'];
+      var who = G.cond({ npcAlive: 'heshen_po' })
+        ? '河婆拄着竹杖一路寻到' + here + '，浑浊的眼盯住你：'
+        : '一个浑身湿透的陌生孩子在' + here + '拦住你，仰头道：';
+      var word = tuo
+        ? '「河神第二回来讨了。渡口的水比上回更凶——你那笔愿再拖，怕是要拿命来抵。」'
+        : '「河神记着你那笔愿呢。渡口的水又起了，它在等你回去还——欠水里那位的，拖不得。」';
+      return who + word;
+    },
+    choices: [
+      {
+        text: '回渡口，还了这桩愿',
+        outcomes: [{ weight: 1, effects: [
+          { tendAdd: { xianghuo: 4 } },
+          { counterAdd: { xinmo: -3 } },
+          { pflagSet: { id: 'heshen_yuan_tuo', v: false } },
+          { goto: 'heshen_du' },
+          { log: { t: '你赶回渡口，焚香沉愿入水。河面晃了一晃，压在心头那笔债，了了。', style: '因果' } }
+        ] }]
+      },
+      {
+        text: '躲着，先不还',
+        outcomes: [{ weight: 1, effects: [
+          { counterAdd: { xinmo: 3 } },
+          { wvarAdd: { villageFear: 3 } },
+          { pflagSet: { id: 'heshen_yuan_tuo' } },   // 读取点：本事件 textFn 据此升级讨愿话术与凶险
+          { rumorAdd: { t: '河神渡的水又邪性了，老人说是有人欠了愿不还，河里那位动了气。' } },
+          { eventDelay: { id: 'ev_heshen_taoyuan', months: 6, note: '河神的愿拖不掉，迟早还要来讨' } },
+          { log: { t: '你避开了渡口。可夜里总梦见湿冷的手，在被角下一寸寸摸索。', style: '凶' } }
         ] }]
       }
     ]
