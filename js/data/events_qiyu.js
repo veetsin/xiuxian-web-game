@@ -228,7 +228,7 @@
         outcomes: [{ weight: 1, effects: [
           { tendAdd: { yinguo: 8 } },
           { pflagSet: { id: 'yaozhai_zhuisuo' } },
-          { eventDelay: { id: 'ev_yaozhai_huixiang', months: 2, note: '药债的线被牵动了' } },
+          { eventDelay: { id: 'ev_yaozhai_huixiang', months: 4, note: '药债的线被牵动了' } },
           { insight: { id: 'jishi_zhimeng', title: '既视之梦', t: '炉前死过人。他欠的债没还完，线还连在活人身上——通向镇里。', confirm: true } },
           { log: { t: '你闭目按住炉壁。无数细线自炉中漫出，散于风里。', style: '因果' } },
           { log: { t: '唯有一根又细又韧，一路指向青石镇。', style: '因果' } }
@@ -1516,7 +1516,7 @@
               { fame: 18 },
               { insight: { id: 'jianzhong_ming', t: '剑冢认我作了主。从此满冢之剑，皆随我意——这一身剑意，是它替我守了百年的。', confirm: true } },
               { rumorAdd: { t: '断剑崖一夜剑鸣鼎沸，有人说，那座千年剑冢，终于认下了一个主人。', fame: 10 } },
-              { eventDelay: { id: 'ev_jianzhong_renzhu_jieju', months: 3, note: '剑冢认主，崖下铸剑老人有话' } }
+              { eventDelay: { id: 'ev_jianzhong_renzhu_jieju', months: 5, note: '剑冢认主，崖下铸剑老人有话' } }
             ],
             onFlee: [
               { hp: -12 },
