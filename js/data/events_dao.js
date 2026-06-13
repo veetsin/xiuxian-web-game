@@ -8,8 +8,13 @@
 //   * 正文写身体与心境的临界感受；事件标题与正文在「纳之」之前仍不得出现道名。
 //
 // ── 本文件对外输出 ──
-//   ev_wu_xuejian / ev_wu_danyao / ev_wu_leifa / ev_wu_lianti / ev_wu_yinguo
-//   （C4 在 daos.js 各 dao.awakeningEvent 按上述 id 填写；id 钉死不改。）
+//   v1：ev_wu_xuejian / ev_wu_danyao / ev_wu_leifa / ev_wu_lianti / ev_wu_yinguo
+//   v2（新增 5，蓝图 §6 钉死，C4 daos.js 各 dao.awakeningEvent 引用，id 不改）：
+//     ev_wu_handu（寒冰）/ ev_wu_shouhun（兽魂）/ ev_wu_xianghuo（香火）/ ev_wu_humei（狐魅）/ ev_wu_yujian（御剑）
+//   （纳之 daoAdvance / 抑之 daoSuppress 严格照 ev_wu_xuejian；命名前正文不见道名。）
+//
+// ── 引用的跨文件 id（均在蓝图钉死表 / ids.js）──
+//   道途：handu / shouhun / xianghuo / humei / yujian（C4 daos.js 实现）。
 //
 // ── 自检十问（对文件整体）──
 // 1标签：隐秘+各道元素。2易共现：各自 tend 过阶段2阈值后 1~2 月（dao.js 安排）。3排斥：环境池（queueOnly）。
@@ -191,6 +196,193 @@
           { counterAdd: { xinmo: 4 } },
           { log: { t: '你背过身。可那只手的影子落在你肩上，凉了很多天。', style: '凶' } },
           { log: { t: '有些账，背过身去也还在长利息。', style: '因果' } }
+        ] }]
+      }
+    ]
+  });
+
+  // ════════ 寒冰顿悟（ev_wu_handu）════════
+  // 母题：寒毒、蓝萤、寒潭。临界感受=骨血里那点凉攒成了实物，要么纳为利器，要么压回去。
+  G.define('event', {
+    id: 'ev_wu_handu', title: '骨里的霜',
+    queueOnly: true, once: true,
+    textFn: function () {
+      return (G.world.season === '冬' || G.world.weather === '雪'
+        ? '又是一个滴水成冰的夜。可这一回，最冷的不是窗外，是你自己的骨头里。'
+        : '盛夏的夜里你却盖了三层被，仍止不住地抖——冷不是从外头来的。')
+        + '这些年钻进骨缝的那点凉，今夜忽然不再四散，反而一寸寸往一处攒。攒到胸口，凝成一小团硬硬的、几乎称得上锋利的东西。你呵出的气是白的，落在被面上，结了一层薄霜。\n它在等你：是把它含住，还是化开。';
+    },
+    tags: ['隐秘', '寒'],
+    baseWeight: 0,
+    choices: [
+      {
+        text: '纳之——把那团凉含在胸口',
+        outcomes: [{ weight: 1, effects: [
+          { daoAdvance: 'handu' },
+          { tendAdd: { handu: 5 } },
+          { hp: -4 },
+          { log: { t: '你含住那团寒。它顺着血脉游遍四肢，所过之处，痛觉都迟钝了。', style: '异象' } },
+          { log: { t: '你伸手按上窗棂，掌印过处，结了一圈细白的霜花。', style: '异象' } },
+          { rumorAdd: { t: '入夏头一桩怪事：有户人家的水缸，半夜结了层冰。', fame: 1 } }
+        ] }]
+      },
+      {
+        text: '抑之——逼一口热血把它化开',
+        outcomes: [{ weight: 1, effects: [
+          { daoSuppress: 'handu' },
+          { hp: -6 },
+          { log: { t: '你咬破舌尖，逼一口热血冲向胸口，把那团凉一点点烘化。', style: '凶' } },
+          { log: { t: '化是化开了。可从此一到阴雨天，你的关节就先疼起来。', style: '凶' } }
+        ] }]
+      }
+    ]
+  });
+
+  // ════════ 兽魂顿悟（ev_wu_shouhun）════════
+  // 母题：黑山妖兽、狼群、兽王坟。临界感受=身后跟着的那些影子第一次有了重量，肯听你的。
+  G.define('event', {
+    id: 'ev_wu_shouhun', title: '身后的影',
+    queueOnly: true, once: true,
+    textFn: function () {
+      return (G.player.counters.xuexing >= 6
+        ? '满身血腥味的这个夜里，你梦见自己又站在了那片兽道上。'
+        : '入夜后山风一起，你莫名走到了屋外，对着黑山的方向站定。')
+        + '这些年你识过太多兽踪、收过太多兽尸，那些走兽的魂气，原来一直没散——它们排在你身后，像一群没主的卒。今夜它们头一回有了分量，齐刷刷把脸转向你，喉间滚着低吼，等一个号令。\n你只要开口，它们就是你的。可一旦应了，你也就成了它们的一员。';
+    },
+    tags: ['隐秘', '兽'],
+    baseWeight: 0,
+    choices: [
+      {
+        text: '纳之——向那群影子伸出手',
+        outcomes: [{ weight: 1, effects: [
+          { daoAdvance: 'shouhun' },
+          { tendAdd: { shouhun: 5 } },
+          { counterAdd: { shaqi: 1 } },
+          { log: { t: '你一伸手，身后群影呜地涌上，没入你的脊背，沉甸甸地落了根。', style: '异象' } },
+          { log: { t: '那一夜起，黑山的兽见了你都绕道——你身上有它们怕的味道。', style: '异象' } },
+          { rumorAdd: { t: '猎户说山里的兽近来邪性，远远见了某个后生，扭头就跑。', fame: 1 } }
+        ] }]
+      },
+      {
+        text: '抑之——喝散那群影子',
+        outcomes: [{ weight: 1, effects: [
+          { daoSuppress: 'shouhun' },
+          { counterAdd: { xinmo: 2 } },
+          { log: { t: '你低喝一声，挥手将那群影子驱散。它们退进黑暗，没有走远。', style: '凶' } },
+          { log: { t: '此后每逢月圆，你后颈总像有无数双眼睛，在等你回头。', style: '凶' } }
+        ] }]
+      }
+    ]
+  });
+
+  // ════════ 香火顿悟（ev_wu_xianghuo）════════
+  // 母题：香火、还愿、河神、邪神。临界感受=多年吃的香火在心口聚成一点暖，能护身也能净邪。
+  G.define('event', {
+    id: 'ev_wu_xianghuo', title: '心口一点暖',
+    queueOnly: true, once: true,
+    textFn: function () {
+      return (G.player.counters.xinmo >= 20
+        ? '心魔最重的这个夜里，你鬼使神差地走进了香烟最浓的地方。'
+        : '一个再寻常不过的夜里，一缕香烟无端从你心口升起。')
+        + '这些年受过的供、上过的香、替人还过的愿，原来没有白费——它们一点点积在你心口，今夜聚成一团温吞吞的暖。这团暖一亮，四下的阴气都退了三尺；连你自己心里那些见不得光的念头，都被它照得无处藏身。\n它问你：要不要把这点暖，认作护身的灯。';
+    },
+    tags: ['隐秘', '香火'],
+    baseWeight: 0,
+    choices: [
+      {
+        text: '纳之——把这点暖认作灯',
+        outcomes: [{ weight: 1, effects: [
+          { daoAdvance: 'xianghuo' },
+          { tendAdd: { xianghuo: 5 } },
+          { counterAdd: { xinmo: -5 } },
+          { log: { t: '你合掌护住心口那点暖。它倏地一亮，满室阴影齐齐退散。', style: '异象' } },
+          { log: { t: '从此你走夜路不必再提灯——心里这盏，照得更远。', style: '异象' } },
+          { rumorAdd: { t: '有人说那后生夜里走过乱坟岗，连个野鬼都没敢凑近。', fame: 1 } }
+        ] }]
+      },
+      {
+        text: '抑之——把这点暖吹熄',
+        outcomes: [{ weight: 1, effects: [
+          { daoSuppress: 'xianghuo' },
+          { counterAdd: { xinmo: 6 } },
+          { log: { t: '你不愿欠人香火的人情，一口气把那点暖吹熄了。', style: '凶' } },
+          { log: { t: '灯灭的刹那，四下的阴气又悄悄漫了回来，贴着你的脚跟。', style: '凶' } }
+        ] }]
+      }
+    ]
+  });
+
+  // ════════ 狐魅顿悟（ev_wu_humei）════════
+  // 母题：狐坳、狐祟、幻术。临界感受=照镜时镜里那张脸开始替你笑，媚气攒到了临界。
+  G.define('event', {
+    id: 'ev_wu_humei', title: '镜里的笑',
+    queueOnly: true, once: true,
+    textFn: function () {
+      return (G.world.weather === '雾'
+        ? '雾锁了整座镇子的这个夜里，你对着一盆静水梳头。'
+        : '夜深人静，你对着一面铜镜出神。')
+        + '镜里那张脸是你的，神情却不全是你的——它先你一步弯了眼，唇角挑起一抹你从没练过的笑。这些年你哄过的人、骗过的关、说过的软话，都化作一缕缠人的媚气，养在眉梢眼角，今夜终于满了。镜里的「你」朝你招手，那笑能勾魂。\n纳它入眼，还是打碎这面镜。';
+    },
+    tags: ['隐秘', '狐', '幻'],
+    baseWeight: 0,
+    choices: [
+      {
+        text: '纳之——对镜里的笑也笑一个',
+        outcomes: [{ weight: 1, effects: [
+          { daoAdvance: 'humei' },
+          { tendAdd: { humei: 5 } },
+          { counterAdd: { xinmo: 2 } },
+          { log: { t: '你也朝镜里弯了眼。两张脸合而为一，那抹媚长在了你脸上。', style: '异象' } },
+          { log: { t: '从此你一抬眼，旁人便不由自主想听你的话——连你自己都怕。', style: '异象' } },
+          { rumorAdd: { t: '镇上姑娘小子都说，那人一笑起来，叫人忘了自己姓什么。', fame: 1 } }
+        ] }]
+      },
+      {
+        text: '抑之——一掌打碎那面镜',
+        outcomes: [{ weight: 1, effects: [
+          { daoSuppress: 'humei' },
+          { hp: -4 },
+          { counterAdd: { xinmo: 3 } },
+          { log: { t: '你一掌拍碎铜镜。碎片里十几张脸，张张都还在朝你笑。', style: '凶' } },
+          { log: { t: '此后你不敢久照镜子——怕那笑，又攒了回来。', style: '凶' } }
+        ] }]
+      }
+    ]
+  });
+
+  // ════════ 御剑顿悟（ev_wu_yujian）════════
+  // 母题：断剑崖、剑冢、剑诀。临界感受=身边铁器自己离手悬空，剑意第一次脱手而行。
+  G.define('event', {
+    id: 'ev_wu_yujian', title: '离手三寸',
+    queueOnly: true, once: true,
+    textFn: function () {
+      return (G.world.season === '春'
+        ? '一个料峭的春夜，你照例擦着那柄剑。'
+        : '夜里你照例擦着那柄剑，剑身映着一点孤灯。')
+        + '擦到一半，手忽然一空——剑自己离了掌心，稳稳悬在你面前三寸处，剑尖随你的目光转。你这才明白，这些年枯坐崖前、临摹剑痕、听剑入眠，那点东西早不在手上了，它在你的意里。屋里所有的铁器都轻轻地颤，争着要听你的号令。\n召它们随你心走，还是按它们回鞘。';
+    },
+    tags: ['隐秘', '剑'],
+    baseWeight: 0,
+    choices: [
+      {
+        text: '纳之——以意驭它，凌空一引',
+        outcomes: [{ weight: 1, effects: [
+          { daoAdvance: 'yujian' },
+          { tendAdd: { yujian: 5 } },
+          { qi: -6 },
+          { log: { t: '你心念一动，那柄剑绕室飞旋，墙上钉的铁器齐齐随它起舞。', style: '异象' } },
+          { log: { t: '剑归鞘时，你的目光所及之处，万物都仿佛带了三分锋。', style: '异象' } },
+          { rumorAdd: { t: '断剑崖下听见过夜半剑鸣，绕梁不绝，像谁在崖上练了一宿。', fame: 1 } }
+        ] }]
+      },
+      {
+        text: '抑之——伸手把它按回掌中',
+        outcomes: [{ weight: 1, effects: [
+          { daoSuppress: 'yujian' },
+          { qi: -3 },
+          { counterAdd: { xinmo: 2 } },
+          { log: { t: '你一把攥住悬空的剑，强按回掌心。剑身嗡鸣不止，像在抗议。', style: '凶' } },
+          { log: { t: '此后你握剑总觉得隔了一层——它认得你，却不肯再听你。', style: '凶' } }
         ] }]
       }
     ]

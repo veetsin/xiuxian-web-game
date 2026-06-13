@@ -13,9 +13,16 @@
 // 读取的跨文件状态：
 //   pflag wuguan_luodi / shu_gei_wuguan / gei_guo_mailuqian / zhouji_liehu / shou_guo_miao /
 //         enshi_sanxiu（npcs.js 落）；su_ji / xianghuo_yinji（C1 births.js 落）
+//   v2 pflag chaodu_xin（npcs.js 拾骸超度落 → 超度人称号）/ shuoshu_ting_shu（npcs.js 听说书落 → 今昔闲话）
 //   flag  lao_liehu_si_yu_lang / sanxiu_guifu（npcs.js）
-//   敌人  六敌四 Boss（ids.js）+ sanxiu_jiedao（npcs.js 私有）
+//   敌人  六敌四 Boss（ids.js v1）+ sanxiu_jiedao（npcs.js 私有）
+//   v2 敌人 humei_yao / ligui / shuigui / hanjiao_you / bali / jianzhong_canling（C4）+
+//         六新 Boss laohu_xian / jianzhong_jianling / hantan_jiao / houshan_shouwang / luanzang_li_zu / heshen
+//   v2 legacy（C4 Boss onWin 落，本文件 {legacy:..} 读）：hu_an_jing / jianzhong_renzhu / hantan_ding /
+//         shouwang_fu / luanzang_an / heshen_ping
+//   v2 NPC 好感（npcs.js）：zhujian_weng / shihai_zhe / heshen_po / hupo（新 Boss 倒下时了愿加好感）
 // 数值簿记：pflags._c5_press_n 记本世威压降服次数（仿引擎 _kills_ 的数字 pflag 用法）。
+// v2 新增 17 称号（见「一、称号」v2 段）；v2 新增 onCombat 反馈 14~22（新道克制 / 新 Boss 险胜与了愿）。
 //
 // TODO-INTEGRATION: 引擎暂无「月末」bus 信号，镇民议论挂在 combat:end / title:grant / realm:up
 //   三类时刻上触发；若 time.js 日后发月末信号，可把 spreadGossip 再挂上去，闲月也能起闲话。
@@ -33,7 +40,7 @@
   'use strict';
 
   // ════════════════════════════════════════════
-  // 一、称号（17 枚）
+  // 一、称号（v1 17 枚 + v2 17 枚 = 34 枚）
   // ════════════════════════════════════════════
 
   // —— 击杀型（kills autoCond，引擎自动计数）——
@@ -189,6 +196,174 @@
     desc: '你不必出手了。你站在那里，对面就会想起所有关于你的传闻。',
     fame: 15,
     rumor: '听说他如今走山路，连兵刃都懒得带了——挡路的自己会让开。'
+  });
+
+  // ════════════════════════════════════════════════════════════════════
+  // ──────────────────  v2 横向扩展：+17 称号（共 34）  ──────────────────
+  // ════════════════════════════════════════════════════════════════════
+  //
+  // ── v2 本段登记 ──
+  // 引用跨文件 id（均在蓝图 §6 钉死表）：
+  //   Boss：laohu_xian / jianzhong_jianling / hantan_jiao / houshan_shouwang / luanzang_li_zu / heshen
+  //   普通敌：humei_yao / ligui / shuigui / hanjiao_you / bali / jianzhong_canling（含 xunzhong_ke 引）
+  //   legacy：hu_an_jing / jianzhong_renzhu / hantan_ding / shouwang_fu / luanzang_an / heshen_ping
+  // 读取的跨文件 pflag：chaodu_xin（npcs.js 拾骸超度落，本段善行称号引）
+  // 评价型称号（无 autoCond，由下方 onCombat 显式 titleAdd）：wanjian_juechen / xianghuo_huti
+  // 自检：每枚称号皆有可感知行为来源 + 传闻；autoCond 均可达（bossDead/kills/legacy/life/tend 组合，
+  //   非死号）；阴德与杀业互斥（shaqi 高低分流）；轮回残响用 {life:{gte:5}}。
+
+  // —— 六新 Boss 击破型（bossDead autoCond，引擎在 Boss 倒下时落 _bossdead_ flag）——
+  G.define('title', {
+    id: 'jinghu_zhe',
+    name: '靖狐者',
+    desc: '狐婆坳底那尊千年的老祖宗，幻术媚不动你的心。坳里的雾，再不迷人了。',
+    fame: 26,
+    rumor: '狐婆坳的雾散了。走夜路的人说，路边再没有死去的亲人唤他们的名字。',
+    autoCond: { bossDead: 'laohu_xian' }
+  });
+  G.define('title', {
+    id: 'jianzhong_zhi_zhu',
+    name: '剑冢之主',
+    desc: '断剑崖万剑成的灵，认你为主。从此那一冢断剑的剑意，都听你一人的腕。',
+    fame: 26,
+    rumor: '断剑崖上的剑鸣停了——不是死了，是认了主。有人说，那一冢的剑，如今跟着一个人走。',
+    autoCond: { bossDead: 'jianzhong_jianling' }
+  });
+  G.define('title', {
+    id: 'zhenjiao_zhe',
+    name: '镇蛟者',
+    desc: '寒潭里盘了千年的那条蛟，被你压回了潭底。潭面上的蓝光，灭了。',
+    fame: 30,
+    rumor: '寒潭不冒蓝气了。采冰的人说，今年的冰，是这些年最好下凿的。',
+    autoCond: { bossDead: 'hantan_jiao' }
+  });
+  G.define('title', {
+    id: 'fushou_zhe',
+    name: '伏兽者',
+    desc: '后山的兽王在你面前伏下了脖子。群兽换了头领，认的是你。',
+    fame: 26,
+    rumor: '后山的兽群近来安分得反常。猎户说，是有人把那头兽王，给降住了。',
+    autoCond: { bossDead: 'houshan_shouwang' }
+  });
+  G.define('title', {
+    id: 'andun_lizu',
+    name: '安乱葬',
+    desc: '乱葬岗百年怨气聚成的厉祖，被你超度了。一岗的枯骨，终于睡安稳了。',
+    fame: 30,
+    rumor: '乱葬岗的鬼火灭了。拾骸的老头给岗上每座坟都重立了幡，说有人替它们了了百年的怨。',
+    autoCond: { bossDead: 'luanzang_li_zu' }
+  });
+  G.define('title', {
+    id: 'xihe_zhe',
+    name: '息河者',
+    desc: '河神渡里收人的那位水神，被你平了。渡口的船，再不必拿活人喂河。',
+    fame: 30,
+    rumor: '河神渡今年没淹人。河婆撤了渡口的祭台，逢人就念，是哪位后生把河患给息了。',
+    autoCond: { bossDead: 'heshen' }
+  });
+
+  // —— 新普通敌·击杀型（kills autoCond，引擎统计 _kills_）——
+  G.define('title', {
+    id: 'yexing_quchong',
+    name: '夜行驱祟客',
+    desc: '厉鬼、水鬼、狐魅——夜里出没的脏东西，被你驱散了不知多少。走夜路的人，如今念你的名。',
+    fame: 14,
+    rumor: '入了夜也敢走荒路的，多半身上揣着那位的名号——脏东西见了他，自己就散。',
+    autoCond: { any: [{ kills: { id: 'ligui', gte: 3 } }, { kills: { id: 'shuigui', gte: 3 } }, { kills: { id: 'humei_yao', gte: 3 } }] }
+  });
+  G.define('title', {
+    id: 'pohan_ren',
+    name: '破寒人',
+    desc: '寒潭里的寒蛟幼崽，被你斩了好几条。那股钻骨的寒，伤不了你分毫。',
+    fame: 12,
+    rumor: '寒潭边采冰的说，水里的小蛟近来少多了——有个不怕冷的，专去潭里寻它们的晦气。',
+    autoCond: { kills: { id: 'hanjiao_you', gte: 2 } }
+  });
+  G.define('title', {
+    id: 'qunshou_zhi_zhu',
+    name: '群兽之主',
+    desc: '后山的熊罴在你面前低过头。山里的野物，渐渐认得你的气味，绕着你走。',
+    fame: 13,
+    rumor: '后山打猎的撞见过怪事：一头熊罴远远见了那个人，竟掉头钻回了林子。',
+    autoCond: { any: [{ kills: { id: 'bali', gte: 2 } }, { tend: { id: 'shouhun', gte: 60 } }] }
+  });
+  G.define('title', {
+    id: 'xunzhong_ke',
+    name: '寻冢客',
+    desc: '断剑崖那一冢的残灵，被你应了一回又一回的剑。那些不肯散的剑意，渐渐认得你的剑路。',
+    fame: 13,
+    rumor: '砍柴的说，断剑崖近来夜夜剑鸣——不是哭了，是有人在跟那一冢的剑，一招一招地对。',
+    autoCond: { kills: { id: 'jianzhong_canling', gte: 3 } }
+  });
+  G.define('title', {
+    id: 'qianmian_ke',
+    name: '千面客',
+    desc: '狐婆坳的幻术、戏台上的脸谱，到你手里都成了惑人的本事。没人猜得透你到底是谁。',
+    fame: 13,
+    rumor: '镇上来了个怪人，谁都觉得跟他相熟，散了场又谁也想不起他长什么样。',
+    autoCond: { any: [{ kills: { id: 'humei_yao', gte: 4 } }, { tend: { id: 'humei', gte: 60 } }] }
+  });
+
+  // —— 御剑评价型（无 autoCond，由 onCombat 显式授予；剑冢残灵或剑灵共鸣的漂亮仗触发）——
+  G.define('title', {
+    id: 'wanjian_juechen',
+    name: '万剑绝尘',
+    desc: '你一动念，剑气便成了阵。看过那一战的人说，那不是用剑——是剑听你的。',
+    fame: 16,
+    rumor: '断剑崖那一场，看热闹的樵夫至今说不清：那么多道剑光，到底是从哪儿冒出来的。'
+  });
+
+  // —— 香火护身型（无 autoCond，由 onCombat 净邪漂亮仗触发）——
+  G.define('title', {
+    id: 'xianghuo_huti',
+    name: '香火护体',
+    desc: '阴邪近不得你的身。你走过的地方，邪祟自己退避，香客说你眉心有光。',
+    fame: 16,
+    rumor: '上香的人传得神乎其神：那位站在庙里，神像前的香，烧得比谁都直。'
+  });
+
+  // —— 新地点收束型（多尊新 Boss 伏诛，方圆诸患皆靖）——
+  G.define('title', {
+    id: 'bafang_jing',
+    name: '八方靖',
+    desc: '寒潭、狐坳、乱葬、河渡……这方圆百里的祸患，被你一处处平了。凡间的夜，因你而太平。',
+    fame: 40,
+    rumor: '十里八乡的人如今睡得着觉了。他们说，是有位活神仙，把藏在山水里的脏东西，一处处都收拾干净了。',
+    autoCond: { any: [
+      { all: [{ legacy: 'hu_an_jing' }, { legacy: 'luanzang_an' }, { legacy: 'heshen_ping' }] },
+      { all: [{ legacy: 'hantan_ding' }, { legacy: 'shouwang_fu' }, { legacy: 'jianzhong_renzhu' }] },
+      { all: [{ legacy: 'heshen_ping' }, { legacy: 'hantan_ding' }, { legacy: 'luanzang_an' }] }
+    ] }
+  });
+
+  // —— 阴德善行·超度型（积阴德 + 手上干净）——
+  G.define('title', {
+    id: 'chaodu_ren',
+    name: '超度人',
+    desc: '无主的骸骨，被你一副副收了、念了往生。乱葬岗的鬼火，因你少了许多。',
+    fame: 12,
+    rumor: '拾骸的老头逢人就说，乱葬岗上多了个心善的后生，跟着他给死人收骨立幡。',
+    autoCond: { pflag: 'chaodu_xin', counter: { id: 'shaqi', lte: 12 } }
+  });
+
+  // —— 杀业升级型（比「煞星」更重的血手；与阴德称号靠 shaqi 互斥）——
+  G.define('title', {
+    id: 'xueye_shashen',
+    name: '血夜煞神',
+    desc: '你身上的血腥，连乱葬岗的枯骨都要偏头避让。这名号，是用命堆出来的。',
+    fame: 16,
+    rumor: '提起那个名字，连说书人都搁下了惊堂木——有些段子，说出来要折寿的。',
+    autoCond: { counter: { id: 'shaqi', gte: 70 } }
+  });
+
+  // —— 轮回残响·深世型（活过五世的人，对这方天地的因果了如指掌）——
+  G.define('title', {
+    id: 'lunhui_ke',
+    name: '轮回客',
+    desc: '这座镇子换了几茬人，山水却都还认得你。没人说得清，你究竟在这里活过几回。',
+    fame: 8,
+    rumor: '镇上最老的人见了那身影，浑身一激灵——他发誓，那张脸，他打小就见过，几十年都没变。',
+    autoCond: { life: { gte: 5 } }
   });
 
   // ════════════════════════════════════════════
@@ -352,6 +527,148 @@
     if (n >= 3) G.fx([{ titleAdd: 'buzhan_quren' }]);
   });
 
+  // ───────────── v2：新道 / 新敌 / 新 Boss 的装逼反馈（≥8 条） ─────────────
+
+  // 14) 御剑漂亮仗 → 「万剑绝尘」+ 剑冢残灵畏其剑意（克制 + 评价型称号）
+  G.sys.social.onCombat(function (p) {
+    if (G.player.dead) return;
+    if (p.result !== 'win') return;
+    // 对剑冢残灵的碾压/秒杀，或御剑小成者对剑灵 Boss 的胜利 → 剑意惊人
+    var jianFeat = (p.enemyId === 'jianzhong_canling' && (p.rating === '碾压' || p.rating === '秒杀')) ||
+      (p.enemyId === 'jianzhong_jianling' && G.cond({ daoStage: { id: 'yujian', gte: 2 } }));
+    if (!jianFeat) return;
+    G.fx([
+      { titleAdd: 'wanjian_juechen' },
+      { tendAdd: { yujian: 3 } },
+      { rumorAdd: { t: '断剑崖那一战，看客只记得满天剑光。「人在剑里，还是剑在人里？」至今没人说得清。', fame: 3 } }
+    ]);
+  });
+
+  // 15) 香火净邪漂亮仗 → 「香火护体」+ 邪物退避（克制 undead/邪 + 评价型称号）
+  G.sys.social.onCombat(function (p) {
+    if (G.player.dead) return;
+    if (p.result !== 'win') return;
+    var xie = (p.enemyId === 'ligui' || p.enemyId === 'shuigui' || p.enemyId === 'humei_yao');
+    if (!xie) return;
+    if (p.rating !== '碾压' && p.rating !== '秒杀') return;
+    if (!G.cond({ tend: { id: 'xianghuo', gte: 40 } })) return;
+    G.fx([
+      { titleAdd: 'xianghuo_huti' },
+      { wvarAdd: { ghostQi: -3 } },
+      { rumorAdd: { t: '那些夜里害人的脏东西，近来见了某道身影竟自己散了。香客说，那人眉心有香火护着。', fame: 2 } }
+    ]);
+  });
+
+  // 16) 兽魂震慑熊罴/兽王 → 群兽伏低，山里传开了「兽王」的名（克制兽 + 传闻）
+  G.sys.social.onCombat(function (p) {
+    if (G.player.dead) return;
+    if (p.enemyId !== 'bali' && p.enemyId !== 'houshan_shouwang') return;
+    if (p.result !== 'win' && p.result !== 'press') return;
+    G.fx([
+      { branch: { cond: { tend: { id: 'shouhun', gte: 30 } }, then: [
+        { tendAdd: { shouhun: 2 } },
+        { log: { t: '那畜生倒下前，喉咙里发出的不是嚎，是臣服的呜咽。它认了你这个新主。', style: '异象' } }
+      ] } },
+      { rumorAdd: { t: '后山的猎户说，山里的野物近来见了那个人都绕道走——像是换了个谁也惹不起的头领。', fame: 2 } }
+    ]);
+  });
+
+  // 17) 寒蛟幼/寒潭蛟前的寒毒压制 → 寒道克续航的现场（克制 + 今昔可印证）
+  G.sys.social.onCombat(function (p) {
+    if (G.player.dead) return;
+    if (p.enemyId !== 'hanjiao_you' && p.enemyId !== 'hantan_jiao') return;
+    if (p.result !== 'win') return;
+    G.fx([
+      { branch: { cond: { tend: { id: 'handu', gte: 40 } }, then: [
+        { tendAdd: { handu: 2 } },
+        { log: { t: '它的寒息冻不住你——你身上的寒，比它更深。蛟在自己的寒里，慢慢沉了下去。', style: '异象' } }
+      ], else: [
+        { log: { t: '你避开它的寒息，寻着空子一击得手。潭面上的蓝光，黯了一瞬。', style: '战' } }
+      ] } }
+    ]);
+  });
+
+  // 18) 媚惑控场胜人形敌 → 狐魅一道的诡谲（克制人形 + 传闻）
+  G.sys.social.onCombat(function (p) {
+    if (G.player.dead) return;
+    if (p.result !== 'win') return;
+    if (!G.cond({ daoStage: { id: 'humei', gte: 2 } })) return;
+    var renxing = (p.enemyId === 'shanfei' || p.enemyId === 'wuguan_dizi' || p.enemyId === 'humei_yao' || p.enemyId === 'sanxiu_jiedao');
+    if (!renxing) return;
+    if (p.rating !== '碾压' && p.rating !== '秒杀') return;
+    G.fx([
+      { tendAdd: { humei: 2 } },
+      { rumorAdd: { t: '跟那人动过手的都说不清自己怎么输的——好像刀砍出去，砍的是自己人。邪门。', fame: 2 } }
+    ]);
+  });
+
+  // 19) 新 Boss 险胜 → 各有各的悲壮（按 Boss 定制的「长夜传说」）
+  G.sys.social.onCombat(function (p) {
+    if (G.player.dead) return;
+    if (!p.boss || p.result !== 'win' || p.rating !== '险胜') return;
+    var line = {
+      laohu_xian: '狐婆坳的雾散尽时，他正靠着坳口的老树喘气。那千年的狐祟，死在了他的真心里。',
+      jianzhong_jianling: '断剑崖上一地碎剑，他在中间站着，浑身是血，却像终于握住了什么。',
+      hantan_jiao: '寒潭的水面结了又化。他从冰窟窿里爬出来，怀里抱着那条蛟最后吐出的一口寒珠。',
+      houshan_shouwang: '后山静了。群兽伏在一圈，中间躺着旧的兽王，站着新的——他拄着刀，站都站不稳。',
+      luanzang_li_zu: '乱葬岗的鬼火一夜烧尽。天亮时拾骸的老头找到他，跪在最大的那座坟前，已哭不出声。',
+      heshen: '河神渡的水退了三尺。他被河婆从浅滩里拖上来时，手里还攥着那柄斩过水神的断剑。'
+    }[p.enemyId];
+    if (!line) return;
+    G.fx([{ rumorAdd: { t: line, fame: 5 } }]);
+  });
+
+  // 20) 新 Boss 倒下 → 对应 NPC 的了愿时刻（人物剧情收束）
+  G.sys.social.onCombat(function (p) {
+    if (G.player.dead) return;
+    if (!p.boss || p.result !== 'win') return;
+    if (p.enemyId === 'jianzhong_jianling') {
+      G.fx([{ branch: { cond: { npcAlive: 'zhujian_weng' }, then: [
+        { npcFavAdd: { id: 'zhujian_weng', n: 20 } },
+        { log: { t: '铸剑老人抚着崖上那一冢断剑，老泪纵横：「它们等的人，到底是来了。」', style: '因果' } }
+      ] } }]);
+    } else if (p.enemyId === 'luanzang_li_zu') {
+      G.fx([{ branch: { cond: { npcAlive: 'shihai_zhe' }, then: [
+        { npcFavAdd: { id: 'shihai_zhe', n: 20 } },
+        { log: { t: '拾骸老者给岗上每座坟重新立了幡。他说，几十年了，今夜的觉，睡得最沉。', style: '因果' } }
+      ] } }]);
+    } else if (p.enemyId === 'heshen') {
+      G.fx([{ branch: { cond: { npcAlive: 'heshen_po' }, then: [
+        { npcFavAdd: { id: 'heshen_po', n: 20 } },
+        { log: { t: '河婆撤了渡口的祭台，对着河水拜了三拜：「这一渡的人，往后不用再喂你了。」', style: '因果' } }
+      ] } }]);
+    } else if (p.enemyId === 'laohu_xian') {
+      G.fx([{ branch: { cond: { npcAlive: 'hupo' }, then: [
+        { npcFavAdd: { id: 'hupo', n: 15 } },
+        { log: { t: '狐婆坐在坳口晒太阳，身边一只狐都没有了。她冲你笑：「了了。我这把老骨头，也能安生了。」', style: '平' } }
+      ] } }]);
+    }
+  });
+
+  // 21) 新 Boss 威压降服 → 凡间的活神仙（不战屈人的更高境界 + 各地传闻）
+  G.sys.social.onCombat(function (p) {
+    if (G.player.dead) return;
+    if (!p.boss || p.result !== 'press') return;
+    var newBoss = (p.enemyId === 'laohu_xian' || p.enemyId === 'jianzhong_jianling' ||
+      p.enemyId === 'hantan_jiao' || p.enemyId === 'houshan_shouwang' ||
+      p.enemyId === 'luanzang_li_zu' || p.enemyId === 'heshen');
+    if (!newBoss) return;
+    G.fx([
+      { fame: 6 },
+      { rumorAdd: { t: '那东西在他面前竟没敢动手——伏低了，散了，退了。人们说，这哪是修士，分明是位活神仙。', fame: 4 } }
+    ]);
+  });
+
+  // 22) 剑冢残灵 / 寒蛟幼等新精怪战败折损 → 凡人莫逞强的告诫（失败也有回响）
+  G.sys.social.onCombat(function (p) {
+    if (G.player.dead) return;
+    if (p.result !== 'lose' || p.boss) return;
+    var newElite = (p.enemyId === 'jianzhong_canling' || p.enemyId === 'hanjiao_you' ||
+      p.enemyId === 'ligui' || p.enemyId === 'humei_yao');
+    if (!newElite) return;
+    G.fx([{ rumorAdd: { t: '又有人不信邪，往那些不干净的地界去了。回来的，只剩半条命和一脸的后怕。', fame: 0 } }]);
+  });
+
   // ════════════════════════════════════════════
   // 三、传闻模板：fame 阶梯 + 今昔对比的镇民议论
   //（在战胜 / 得称号 / 突破 这些「出名的时刻」起话头，每世每条只说一次）
@@ -385,7 +702,20 @@
       t: '老猎户坟头多了颗狼王的獠牙。没人看见是谁放的，也没人需要问。' },
     { id: 'g_gushiren', cond: { life: { gte: 2 }, fame: { gte: 80 } },
       t: '镇上最老的人说，你让他想起几十年前的一个人。叫什么，他想不起来了。',
-      fx: [{ tendAdd: { yinguo: 2 } }] }
+      fx: [{ tendAdd: { yinguo: 2 } }] },
+    // ── v2：新道 / 新 Boss / 说书人放大器 的今昔对比 ──
+    { id: 'g_ting_zijishu', cond: { fame: { gte: 60 }, pflag: 'shuoshu_ting_shu' },
+      t: '「你听过说书的讲那段没有？」「讲谁的？」「就……坐你旁边那位的。」满座哗然。' },
+    { id: 'g_jianke', cond: { fame: { gte: 80 }, daoStage: { id: 'yujian', gte: 2 } },
+      t: '有人说在断剑崖见过他御剑——一道人影，身后跟着一片不肯落地的剑光。' },
+    { id: 'g_xianghuo', cond: { fame: { gte: 80 }, daoStage: { id: 'xianghuo', gte: 2 } },
+      t: '上香的妇人传得神乎其神：那位过庙不拜，神像前的香却替他自己直了腰。' },
+    { id: 'g_huoshen', cond: { fame: { gte: 60 }, daoStage: { id: 'humei', gte: 2 } },
+      t: '「狐婆坳养出来的，到底不一样。」「嘘——别让他听见，谁知道他这会儿是不是你二叔。」' },
+    { id: 'g_zhushui', cond: { bossDead: 'heshen' },
+      t: '河神渡的老人们改了口：从前求河神保平安，如今烧香，求的是那位莫要走远。' },
+    { id: 'g_anbafang', cond: { title: 'bafang_jing' },
+      t: '走方的货郎把这方圆百里的太平，编成了顺口溜，一路唱到了邻县去。' }
   ];
 
   function spreadGossip() {

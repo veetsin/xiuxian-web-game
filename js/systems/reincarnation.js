@@ -206,5 +206,32 @@
       w.flags['_bossdead_dashixiong_boss'] = true;
       if (w.locations.wuguan) w.locations.wuguan.bossAlive = false;
     }
+    // ── v2 新 Boss 击破 / 支线收束的跨世修正 ──
+    if (L.hu_an_jing) { // 老狐仙已了：狐婆坳魅气消，狐祟不复
+      w.flags['_bossdead_laohu_xian'] = true;
+      if (w.locations.hupo_ao) { w.locations.hupo_ao.bossAlive = false; w.locations.hupo_ao.corruption = 0; }
+    }
+    if (L.jianzhong_renzhu) { // 剑冢认主：剑灵伏，断剑崖灵气涨
+      w.flags['_bossdead_jianzhong_jianling'] = true;
+      if (w.locations.duanjianya) { w.locations.duanjianya.bossAlive = false; w.locations.duanjianya.spiritualEnergy += 30; }
+    }
+    if (L.hantan_ding) { // 寒潭蛟死：水患息，寒潭险降
+      w.flags['_bossdead_hantan_jiao'] = true;
+      if (w.locations.hantan) { w.locations.hantan.bossAlive = false; w.locations.hantan.danger = Math.max(0, w.locations.hantan.danger - 25); }
+    }
+    if (L.shouwang_fu) { // 兽王臣服：后山兽群驯顺，狼患低开
+      w.flags['_bossdead_houshan_shouwang'] = true;
+      w.vars.wolfThreat = Math.min(w.vars.wolfThreat, 10);
+      if (w.locations.houshan_lin) w.locations.houshan_lin.bossAlive = false;
+    }
+    if (L.luanzang_an) { // 乱葬厉祖镇：乱葬岗安宁，镇恐慌低开
+      w.flags['_bossdead_luanzang_li_zu'] = true;
+      w.vars.villageFear = Math.min(w.vars.villageFear, 10);
+      if (w.locations.luanzang_gang) { w.locations.luanzang_gang.bossAlive = false; w.locations.luanzang_gang.corruption = 0; }
+    }
+    if (L.heshen_ping) { // 河神平：河患息，河神渡险降
+      w.flags['_bossdead_heshen'] = true;
+      if (w.locations.heshen_du) { w.locations.heshen_du.bossAlive = false; w.locations.heshen_du.danger = Math.max(0, w.locations.heshen_du.danger - 20); }
+    }
   }
 })();

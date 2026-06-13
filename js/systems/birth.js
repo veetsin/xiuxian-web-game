@@ -51,6 +51,17 @@
       p.maxQi = 10 + p.stats.shen * 5;
       p.qi = Math.round(p.maxQi * 0.5);
 
+      // ── 时间影响（出生的第三根轴，除属性/道途外）──
+      //   startMonth：这一世从哪个月（哪一季）起步 → 决定开局天时与早期季节事件，
+      //     借此把出身与道途绑定（雷法子生于雷雨夏、寒冰子生于雪冬、御剑子生于春…）。
+      //   lifespanMod：先天寿元增减（病弱减、根骨壮者增）→ 改变这一世的时间压力。
+      if (def.startMonth != null) {
+        var sm = G.clamp(def.startMonth, 1, 12);
+        G.world.month = sm;
+        G.world.season = sm <= 3 ? '春' : sm <= 6 ? '夏' : sm <= 9 ? '秋' : '冬';
+      }
+      if (def.lifespanMod) p.lifespan = Math.max(20, p.lifespan + def.lifespanMod);
+
       (def.items || []).forEach(function (it) { G.addItem(it.id, it.n || 1); });
       if (def.npcFav) {
         for (var n in def.npcFav) {

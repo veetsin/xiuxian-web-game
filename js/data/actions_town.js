@@ -7,22 +7,27 @@
 //
 // ── 本文件对外输出（登记）──
 //   新增物品：shoujia（兽夹，设陷阱用）、xiangzhu（香烛，上香用）
-//   pflag：zhi_feikuang（已听说废矿，控制 revealLoc 不重复）、wuguan_neitang_de（已偷得内堂拳谱）、
-//          ren_chu_gufang（循前世记忆认出柜底古方，给 C3 丹线接）
-//   legacy：dashixiong_defeated（偷拳谱被堵后反胜大师兄时落下）
-//   insight 条目：yaoxing_zaji（药性杂记）、wuguan_quanpu（墙上拳谱）
+//     ┄ v2 ┄ biaoqi（镖旗，misc，雇镖/护商凭证，可售）、zhiqian（纸钱，misc，乱葬/义庄/河神渡通用，消费于收骸·祭河·守灵）
+//   pflag：zhi_feikuang / wuguan_neitang_de / ren_chu_gufang
+//     ┄ v2 ┄ zhi_luanzang（已听说乱葬岗，revealLoc 去重）、zhi_yima（已知驿马关，revealLoc 去重）、
+//            zhi_heshen（已听说河神渡，revealLoc 去重）、de_biaoqi（已得镖旗）
+//   legacy：dashixiong_defeated
+//   insight 条目：yaoxing_zaji / wuguan_quanpu ┄ v2 ┄ xiyan_jiqiao（戏言机巧，humei 暗示）
 //   引用记忆（C1）：mem_yaofang_gufang（古方残页钥匙）
 //   引用的钉死事件（C3 并行实现）：ev_jishi_fengbo / ev_wuguan_shijian
-//   废弃矿洞唯一保底发现路径在本文件：dating_xiaoxi 的「老矿工醉话」outcome。
+//   引用敌（C4 并行，蓝图 §3）：shanfei（雇镖护商遇匪，已有）
+//   废弃矿洞唯一保底发现路径在本文件：dating_xiaoxi 的「老矿工醉话」outcome；
+//   v2 三地保底发现路径同样在 dating_xiaoxi（乱葬岗/驿马关/河神渡 各一 revealLoc outcome）。
 //
 // ── 自检十问 ──
-// 1标签：劳作/市集/交际/药/体。2易共现：镇内人脉、攒钱买药、市价行情、武馆受辱与扬名。
-// 3排斥：黑山的搏命活（镇中无 risk 3）；偷拳谱与大师兄好感互斥。
-// 4改状态：钱/物品/好感/倾向/世界变量/传闻/拳脚伤。5后果：宰牲沾血腥（夜路引狼的闭环原料）、
-//   采买受 marketPrice 行情牵动、打听消息揭开废矿并搬运世情、切磋胜负都喂筋骨。
-// 6可解释：穷人先吃饭再求道；血腥味来自肉案；药价随行就市。7钩子：平安钱/巡使盘问/柜底收妖狼牙/
-//   后山醉话，全是给 C3/C5 的咬合点。8有趣选择：一个月买药=一个月不挣钱；偷看内堂=高风险换厚利。
-// 9服务 build：宰牲喂血与杀、辨药喂丹、练拳切磋喂体、吐纳是所有路的底。10不暴露：无任何机制词。
+// 1标签：劳作/市集/交际/药/体/渡/葬。2易共现：镇内人脉、攒钱买药、市价行情、武馆扬名、商路镖局、戏台说书。
+// 3排斥：黑山的搏命活（镇中无 risk 3）；偷拳谱与大师兄好感互斥；义庄阴冷与草市喧闹互斥。
+// 4改状态：钱/物品/好感/倾向/世界变量/传闻/拳脚伤。5后果：宰牲沾血腥、采买受 marketPrice 牵动、
+//   打听揭开废矿/乱葬/驿马关/河神渡并搬运世情、雇镖压商路风险、戏台哄人喂狐。
+// 6可解释：穷人先吃饭再求道；血腥味来自肉案；药价随行就市；商队过关才有镖局生意。
+// 7钩子：平安钱/柜底收货/后山醉话/河祸传闻/戏班拾儿，全是给 C3/C5 的咬合点。
+// 8有趣选择：一个月买药=一个月不挣钱；偷看内堂=高风险换厚利；雇镖稳当但费钱。
+// 9服务 build：宰牲喂血与杀、辨药喂丹、练拳喂体、戏台哄人喂狐、吐纳是所有路的底。10不暴露：无任何机制词。
 //
 // TODO-INTEGRATION: 卖山货每月每种至多结算一件（引擎无按持有量循环的 op）；若日后支持批量出售可改。
 (function () {
@@ -36,6 +41,15 @@
   G.define('item', {
     id: 'xiangzhu', name: '香烛', type: 'misc', price: 3,
     desc: '一对素香红烛。山神庙的香炉冷了很久了。'
+  });
+  // ┄ v2 ┄
+  G.define('item', {
+    id: 'biaoqi', name: '镖旗', type: 'misc', price: 12,
+    desc: '驿马关镖局发的护货小旗，插在车头能少招些蟊贼。旗角绣着个褪了色的「镖」字。'
+  });
+  G.define('item', {
+    id: 'zhiqian', name: '纸钱', type: 'misc', price: 2,
+    desc: '一沓黄表纸钱。烧给无主的、淹死的、横死的——它们也认这个。'
   });
 
   // ════════════════ 青石镇 ════════════════
@@ -128,6 +142,17 @@
       { weight: 2, cond: { wvar: { id: 'sectAttention', gte: 10 } }, effects: [
         { wvarAdd: { sectAttention: 1 } },
         { rumorAdd: { t: '镇上来了位佩剑的生人，挨家查问近来的怪事。' } }] },
+      { weight: 2, cond: { nopflag: 'zhi_yima' }, effects: [   // 驿马关：商路枢纽，打听商情即解锁
+        { pflagSet: { id: 'zhi_yima' } }, { revealLoc: 'yima_guan' },
+        { log: { t: '茶客们正议论官道上的驿马关：「那关前的草市，啥都买得着。」', style: '世界' } }] },
+      { weight: 2, cond: { nopflag: 'zhi_heshen', any: [{ wvar: { id: 'villageFear', gte: 20 } }, { season: '春' }] },
+        effects: [   // 河神渡：河祸传闻/开春祭河话头解锁
+        { pflagSet: { id: 'zhi_heshen' } }, { revealLoc: 'heshen_du' },
+        { rumorAdd: { t: '河神渡又要祭河了。老人说今年祭轻了，夏汛怕是要淹人。' } }] },
+      { weight: 2, cond: { nopflag: 'zhi_luanzang', any: [{ wvar: { id: 'ghostQi', gte: 35 } }, { season: '冬' }] },
+        effects: [   // 乱葬岗：阴气重/隆冬厉鬼夜出话头解锁
+        { pflagSet: { id: 'zhi_luanzang' } }, { revealLoc: 'luanzang_gang' }, { tendAdd: { yinguo: 1 } },
+        { rumorAdd: { t: '镇西乱葬岗夜里又见磷火，更夫说听见坡上有人在喊冤。' } }] },
       { weight: 3, effects: [{ counterAdd: { xinmo: -1 } },
         { log: { t: '听了一肚子家长里短，没什么正经消息，倒也解闷。', style: '平' } }] }
     ],
@@ -219,12 +244,21 @@
     loc: 'yaopu', timeCost: 1, risk: 0, order: 40,
     cond: { any: [{ item: { id: 'langpi', n: 1 } }, { item: { id: 'langya', n: 1 } },
                   { item: { id: 'yaolang_ya', n: 1 } }, { item: { id: 'ningxuecao', n: 1 } },
-                  { item: { id: 'yinsui', n: 1 } }] },
+                  { item: { id: 'yinsui', n: 1 } }, { item: { id: 'hanjing', n: 1 } },
+                  { item: { id: 'shouwang_zhua', n: 1 } }] },
     effects: [
       { branch: { cond: { item: { id: 'yinsui', n: 1 } }, then: [   // 矿洞尸王身上的阴髓，识货的掌柜肯出大价
         { itemDel: { id: 'yinsui', n: 1 } }, { npcFavAdd: { id: 'yaopu_laoban', n: 3 } },
         { branch: { cond: { wvar: { id: 'marketPrice', gte: 115 } }, then: [{ money: 55 }], else: [{ money: 40 }] } },
         { log: { t: '掌柜的一见那截阴髓，瞳孔一缩，压低声音报了个数。', style: '丹' } }] } },
+      { branch: { cond: { item: { id: 'hanjing', n: 1 } }, then: [   // 寒潭寒萤石，配药引材，郎中也抢
+        { itemDel: { id: 'hanjing', n: 1 } }, { npcFavAdd: { id: 'yaopu_laoban', n: 2 } },
+        { branch: { cond: { wvar: { id: 'marketPrice', gte: 115 } }, then: [{ money: 22 }], else: [{ money: 16 }] } },
+        { log: { t: '掌柜的捏着那颗寒萤石呵了口气，石上的霜半晌不化：「好东西。」', style: '丹' } }] } },
+      { branch: { cond: { item: { id: 'shouwang_zhua', n: 1 } }, then: [   // 后山兽王爪，炼器避兽的稀罕料
+        { itemDel: { id: 'shouwang_zhua', n: 1 } }, { npcFavAdd: { id: 'yaopu_laoban', n: 2 } },
+        { branch: { cond: { wvar: { id: 'marketPrice', gte: 115 } }, then: [{ money: 50 }], else: [{ money: 38 }] } },
+        { log: { t: '掌柜的掂着那只兽王爪，咋舌：「挂门上能镇宅，我替你寻个识货的。」', style: '平' } }] } },
       { branch: { cond: { item: { id: 'langpi', n: 1 } }, then: [
         { itemDel: { id: 'langpi', n: 1 } },
         { branch: { cond: { wvar: { id: 'marketPrice', gte: 115 } }, then: [{ money: 8 }], else: [{ money: 5 }] } }] } },
@@ -345,6 +379,134 @@
       { weight: 6, cond: { realm: { lte: 1 } }, effects: [
         { counterAdd: { xinmo: 2 } },
         { log: { t: '你连引气都未稳，几道试题下来汗透重衣。巡使收回名帖：「火候未到，三年后再来。」', style: '凶' } }] }
+    ]
+  });
+
+  // ════════════════ 青石镇 — v2 戏台（humei 饲料）════════════════
+
+  G.define('action', {
+    id: 'xitai_chang', name: '戏台帮闲', desc: '镇口搭了戏台，帮着张罗、跑场、哄看客叫好。会哄人的吃这碗饭。',
+    loc: 'qingshizhen', timeCost: 1, risk: 0, order: 28,
+    effects: [{ money: 3 }, { tendAdd: { humei: 2 } }],
+    outcomes: [
+      { weight: 5, effects: [{ money: 2 }, { fame: 1 },
+        { log: { t: '你一嗓子叫好带起满场喝彩，班主多赏了你几个钱。', style: '平' } }] },
+      { weight: 3, cond: { stat: { id: 'min', gte: 4 } }, effects: [
+        { tendAdd: { humei: 3 } }, { fame: 1 },
+        { insight: { id: 'xiyan_jiqiao', title: '戏言机巧', t: '看客想听什么，我一眼就看得出。话顺着他的心说，钱袋自己就开了。', confirm: true } },
+        { log: { t: '你顺着看客的脸色编词，三句话就把一个生人哄得掏了赏钱。', style: '吉' } }] },
+      { weight: 2, cond: { birth: 'xiban_qi' }, effects: [
+        { tendAdd: { humei: 4 } }, { money: 3 },
+        { log: { t: '这台你熟门熟路。班主拍你肩：「还是你哄人有一套。」', style: '吉' } }] },
+      { weight: 2, effects: [{ counterAdd: { xinmo: 1 } },
+        { log: { t: '哄了一整月看客，散场后对着空台子，你忽然不知自己是谁。', style: '凶' } }] }
+    ]
+  });
+
+  // ════════════════ 义庄（xianghuo / handu / yinguo）════════════════
+
+  G.define('action', {
+    id: 'tingling_shouye', name: '义庄守夜', desc: '替义庄守一夜停灵。工钱给得爽快——夜里白布鼓动，莫要去掀。',
+    loc: 'yizhuang', timeCost: 1, risk: 2, order: 10,
+    effects: [{ money: 4 }, { tendAdd: { yinguo: 2 } }, { counterAdd: { xinmo: 1 } }],
+    outcomes: [
+      { weight: 4, effects: [
+        { branch: { cond: { item: { id: 'zhiqian', n: 1 } },
+          then: [{ itemDel: { id: 'zhiqian', n: 1 } }, { wvarAdd: { ghostQi: -2 } }, { tendAdd: { xianghuo: 2 } },
+            { log: { t: '你在每张板床前烧了张纸钱。这一夜，白布没再动过。', style: '因果' } }],
+          else: [{ tendAdd: { yinguo: 1 } },
+            { log: { t: '一夜更鼓，停灵的白布纹丝不动。天亮时你松了口气。', style: '平' } }] } }] },
+      { weight: 3, effects: [
+        { counterAdd: { xinmo: 2 } }, { wvarAdd: { ghostQi: 1 } }, { tendAdd: { handu: 1 } },
+        { log: { t: '后半夜一具尸身的指头动了动。你死死盯着，直到天光。', style: '凶' } }] },
+      { weight: 2, cond: { wvar: { id: 'ghostQi', gte: 55 } }, effects: [
+        { hp: -8 }, { counterAdd: { xinmo: 3 } }, { wvarAdd: { ghostQi: 2 } },
+        { log: { t: '一盏长明灯无风自灭。黑暗里，有谁掀开了白布坐起来。', style: '凶' } }] },
+      { weight: 2, cond: { tend: { id: 'xianghuo', gte: 25 } }, effects: [
+        { wvarAdd: { ghostQi: -3 } }, { tendAdd: { xianghuo: 3 } },
+        { log: { t: '你守夜时低声诵念，庄里的阴气竟随你的呼吸一寸寸退散。', style: '异象' } }] }
+    ]
+  });
+
+  G.define('action', {
+    id: 'tingshi_dagong', name: '义庄打杂', desc: '替义庄抬棺、净身、缝裹尸布。晦气活，工钱却比别处高。',
+    loc: 'yizhuang', timeCost: 1, risk: 1, order: 20,
+    effects: [{ money: 5 }, { counterAdd: { xinmo: 1 } }],
+    outcomes: [
+      { weight: 5, effects: [{ tendAdd: { yinguo: 1 } },
+        { log: { t: '一具具收殓妥当，你的手越来越稳，心也越来越沉。', style: '平' } }] },
+      { weight: 3, effects: [{ itemAdd: { id: 'zhiqian', n: 1 } }, { itemAdd: { id: 'fuzhi', n: 1 } },
+        { log: { t: '死者怀里搜出一沓没烧完的纸钱和一张旧符，你替他收了。', style: '平' } }] },
+      { weight: 2, cond: { stat: { id: 'shen', gte: 4 } }, effects: [
+        { tendAdd: { yinguo: 2 } }, { counterAdd: { xinmo: 1 } },
+        { log: { t: '替一具溺亡的尸身净身时，你摸到它指缝里还攥着河底的水草。', style: '因果' } }] },
+      { weight: 2, effects: [{ hp: -5 }, { counterAdd: { xinmo: 2 } },
+        { log: { t: '裹尸时那张脸忽然朝你笑了一下。你后退半步，撞翻了灯。', style: '凶' } }] }
+    ]
+  });
+
+  // ════════════════ 驿马关（经济 / 交际）════════════════
+
+  G.define('action', {
+    id: 'guanqian_ganji', name: '关前赶集', desc: '驿马关的草市三教九流，南北货都有。行情时好时坏，全看时运。',
+    loc: 'yima_guan', timeCost: 1, risk: 0, order: 10,
+    cond: { money: { gte: 8 } },
+    effects: [],
+    outcomes: [
+      { weight: 4, effects: [{ money: -8 }, { itemAdd: { id: 'ganliang', n: 2 } }, { itemAdd: { id: 'shaodaozi', n: 1 } },
+        { log: { t: '草市上转了一日，添了干粮，还捎了壶关外的烧刀子。', style: '平' } }] },
+      { weight: 3, cond: { wvar: { id: 'marketPrice', lte: 90 } }, effects: [
+        { money: -8 }, { itemAdd: { id: 'liaoshang_yao', n: 1 } }, { itemAdd: { id: 'zhiqian', n: 2 } },
+        { log: { t: '关外药材贱，你低价收了一帖好疗伤药，还顺了沓纸钱。', style: '吉' } }] },
+      { weight: 3, cond: { wvar: { id: 'marketPrice', gte: 120 } }, effects: [
+        { money: -6 }, { itemAdd: { id: 'ganliang', n: 1 } }, { wvarAdd: { sectAttention: 0 } },
+        { log: { t: '关税涨了，啥都贵，你捏着钱袋只敢添了点干粮。', style: '平' } }] },
+      { weight: 2, cond: { money: { gte: 12 }, nopflag: 'de_biaoqi' }, effects: [
+        { money: -12 }, { pflagSet: { id: 'de_biaoqi' } }, { itemAdd: { id: 'biaoqi', n: 1 } },
+        { log: { t: '镖局的人塞给你一面护货小旗：「插车头上，蟊贼能少招几个。」', style: '平' } }] }
+    ]
+  });
+
+  G.define('action', {
+    id: 'datan_shanglu', name: '打探商路', desc: '在镖师酒桌、货郎摊前听商路上的风声。消息有时比货还值钱。',
+    loc: 'yima_guan', timeCost: 1, risk: 0, order: 20,
+    cond: { money: { gte: 1 } },
+    effects: [{ money: -1 }],
+    outcomes: [
+      { weight: 4, effects: [{ wvarAdd: { marketPrice: -4 } }, { money: 2 },
+        { log: { t: '你探得一支贱卖的货队将到，转手指给相熟的掌柜，赚了个跑腿钱。', style: '吉' } }] },
+      { weight: 3, cond: { wvar: { id: 'sectAttention', gte: 8 } }, effects: [
+        { wvarAdd: { sectAttention: 1 } },
+        { rumorAdd: { t: '驿马关来过几个佩剑的生人，问的全是镇里近来的怪事。' } }] },
+      { weight: 2, cond: { wvar: { id: 'wolfThreat', gte: 50 } }, effects: [
+        { wvarAdd: { villageFear: 1 } },
+        { rumorAdd: { t: '近来商队都绕开黑山脚那条近道——说是入夜有狼跟车。' } }] },
+      { weight: 3, effects: [{ counterAdd: { xinmo: -1 } }, { money: 1 },
+        { log: { t: '听了一桌子南北奇谈，没探着正经商情，倒蹭了顿酒。', style: '平' } }] }
+    ]
+  });
+
+  G.define('action', {
+    id: 'guhuo_huzou', name: '雇镖护商', desc: '随商队走一趟近道，挂旗当个散镖。镖银厚，路上未必太平。',
+    loc: 'yima_guan', timeCost: 1, risk: 2, order: 30,
+    cond: { money: { gte: 1 } },
+    effects: [{ counterAdd: { shaqi: 1 } }],
+    outcomes: [
+      { weight: 4, effects: [
+        { branch: { cond: { item: { id: 'biaoqi', n: 1 } }, then: [{ money: 16 }], else: [{ money: 12 }] } },
+        { fame: 1 },
+        { log: { t: '一路无事，商队顺顺当当过了关。镖银到手，沉甸甸的。', style: '吉' } }] },
+      { weight: 3, effects: [
+        { combat: { enemy: 'shanfei', intro: '近道转角滚石一拦，挎刀的劫匪拍着刀背：「留下买路钱！」',
+          onWin: [{ money: 18 }, { fame: 3 }, { counterAdd: { xuexing: 2 } },
+            { rumorAdd: { t: '驿马关那边来了个能打的散镖，劫道的吃了大亏。', fame: 2 } }],
+          onLose: [{ injure: { months: 1, severity: 1 } }, { money: -8 }, { counterAdd: { xinmo: 1 } },
+            { log: { t: '货被劫了，你也挨了刀。镖局的脸色，难看得很。', style: '凶' } }],
+          onFlee: [{ money: -5 }, { counterAdd: { xinmo: 1 } },
+            { log: { t: '你弃货保命，护的镖丢了，镖银自然也没了。', style: '凶' } }] } }] },
+      { weight: 2, cond: { fame: { gte: 30 } }, effects: [
+        { money: 14 }, { fame: 2 }, { wvarAdd: { villageFear: -1 } },
+        { log: { t: '你的名头在道上传开，这趟连匪影都没见，镖银照拿。', style: '吉' } }] }
     ]
   });
 })();
