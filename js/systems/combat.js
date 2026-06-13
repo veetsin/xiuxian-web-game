@@ -80,8 +80,9 @@
     var hooks = [];
     (G.player.phenomena || []).forEach(function (phId) {
       var found = G.sys.dao.phenomenonDef(phId);
-      if (found && found.ph.hooks) found.ph.hooks.forEach(function (h) {
-        hooks.push({ on: h.on, chance: h.chance, cond: h.cond, fx: h.fx, _ph: found.ph.name });
+      if (found && found.ph.hooks) found.ph.hooks.forEach(function (h, i) {
+        hooks.push({ on: h.on, chance: h.chance, cond: h.cond, fx: h.fx,
+          once: h.once, _id: phId + ':' + i, _ph: found.ph.name });
       });
     });
     return hooks;
@@ -97,10 +98,13 @@
 
   function runHooks(on) {
     var c = G.combat; if (!c || c.over) return;
+    c.firedOnce = c.firedOnce || {};
     c.hooks.forEach(function (h) {
       if (h.on !== on) return;
+      if (h.once && c.firedOnce[h._id]) return;   // 每战一次：触发过即封印（如「死生之帘」致命伤免死）
       if (h.cond && !G.cond(h.cond)) return;
       if (h.chance != null && !G.rng.chance(h.chance)) return;
+      if (h.once) c.firedOnce[h._id] = true;
       cfx(h.fx);
     });
   }
@@ -432,12 +436,20 @@
     finish('win', c.rating);
   }
 
+  // 非致命强敌（武馆弟子、大师兄）打不死你，但惨败会刻下一道「败绩之忆」（defeatCause 匹配，carry 到来世）
+  function grantDefeatMem(eid) {
+    var m = null;
+    G.all('memory').forEach(function (d) { if (!m && d.defeatCause === eid) m = d; });
+    if (m && G.player.memories.indexOf(m.id) < 0) G.sys.rein.gainMemory(m.id);
+  }
+
   function lose() {
     var c = G.combat, p = G.player;
     if (c.tr.nonLethal && !c.onLose) {
       // 非致命战败默认：被打趴 + 受伤 + 丢点钱
       p.hp = 1;
       clog('你眼前一黑栽倒在地。再睁眼时，对方已经走了。', '凶');
+      grantDefeatMem(c.eid);
       c.onLose = [
         { injure: { months: 2, severity: 2 } },
         { money: -Math.min(p.money, 5) },
@@ -448,6 +460,7 @@
     if (c.onLose) {
       p.hp = Math.max(p.hp, 1);
       clog('你撑不住了……', '凶');
+      grantDefeatMem(c.eid);
       return finish('lose', null);
     }
     // 默认：战败即死

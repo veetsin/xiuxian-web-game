@@ -98,10 +98,10 @@
   G.define('memory', {
     id: 'mem_death_wuguan_dizi',
     title: '演武场的黄土',
-    kind: 'death',
-    deathCause: 'wuguan_dizi',
+    kind: 'defeat',
+    defeatCause: 'wuguan_dizi',   // 武馆弟子 nonLethal 打不死你，但这一败会刻进记忆、带去来世
     carry: true,
-    text: '演武场上你被一拳放倒，再没能起来。围观的哄笑散得很快，你的名字散得更快。',
+    text: '演武场上你被一拳放倒，半晌爬不起来。围观的哄笑散得很快，你的名字散得更快。',
     dream: '你梦见演武场的黄土贴着脸。下回，先站稳了再出手。'
   });
 
@@ -129,10 +129,10 @@
   G.define('memory', {
     id: 'mem_death_dashixiong_boss',
     title: '三成力',
-    kind: 'death',
-    deathCause: 'dashixiong_boss',
+    kind: 'defeat',
+    defeatCause: 'dashixiong_boss',   // 大师兄 nonLethal 不取你性命，但这口气你咽不下，会记一世
     carry: true,
-    text: '「我只用三成力。」这是你前世听见的最后一句人话。他收拳的时候，连汗都没出。',
+    text: '「我只用三成力。」这是你前世记牢的一句话。他收拳的时候，连汗都没出。',
     dream: '你梦见那只收回去的拳头。梦里你在心口刻字：来日，再登门。'
   });
 

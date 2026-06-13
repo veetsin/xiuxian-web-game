@@ -175,6 +175,9 @@
       });
       G.save.write(true);
       if (G.ui) { G.ui.setMode('loc'); G.ui.refresh(); }
+      // 开局身世剧情：立即弹卡（不再延后两个 tick）。每世世界重置，_evdone 随之清零，故可重弹。
+      (bdef.earlyHooks || []).forEach(function (h) { G.sys.events.fire(h.id); });
+      G.sys.events.pumpPending();
     }
   };
 

@@ -1260,6 +1260,8 @@
   G.define('event', {
     id: 'ev_fuchou_zhi_zhan', title: '武馆之约',
     queueOnly: true, baseWeight: 0,
+    // 到期复检：大师兄已入仙门离镇，则两年之约自然作废，不再硬把人召回打这一场
+    dueCond: { noflag: 'dashixiong_li_guan' },
     textFn: function () {
       return '约定之期到了。演武场上的人比那天多出数倍——没人忘了当年那个' +
         (G.player.birthId === 'wuguan_zayi' ? '杂役' : '后生') +

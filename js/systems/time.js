@@ -172,6 +172,12 @@
         G.sys.time.setWvar('sectAttention', G.world.vars.sectAttention + 8);
       }
     } else {
+      // 走火入魔：心魔深重者强行冲关，魔念可能在识海炸开而致死（命中 mem_death_tupo_shibai）
+      if (p.counters.xinmo >= 50 && G.rng.chance(0.25)) {
+        G.log('你强压心魔冲关，那念头却在识海里炸开——你七窍溢血，再没能起身。', '凶');
+        G.sys.rein.die('tupo_shibai');
+        return;
+      }
       // 突破失败三种代价：受伤 / 丹毒爆发 / 修为小退
       var roll = G.rng.int(1, 3);
       if (roll === 1 || p.counters.dandu < 10) {

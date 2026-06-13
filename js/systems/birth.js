@@ -63,10 +63,8 @@
       // 命签：三签抽一，存给出生卡与开局日志
       if (def.mingqian && def.mingqian.length) p.pflags._mingqian = G.rng.pick(def.mingqian);
 
-      // 开局钩子：按月安排剧情事件
-      (def.earlyHooks || []).forEach(function (h) {
-        G.sys.events.schedule(h.id, h.months || 1, '出生剧情');
-      });
+      // 开局钩子由 enterLife 在「睁眼」时立即触发（见 reincarnation.enterLife）——
+      // 不再走 eventDelay，否则要等两次月度推进才弹，开场身世剧情会姗姗来迟。
 
       if (def.startEffects && def.startEffects.length) G.fx(def.startEffects, { cause: '出生' });
 

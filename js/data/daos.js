@@ -326,8 +326,9 @@
             { cshield: 15 },
             { clog: { t: '【异象】千百种死法自眼前闪过，你拣中了那条活路。', style: '因果' } }
           ]},
-          // 致命伤免死：hit 钩子在死亡判定之前结算，回血即续命（TODO-INTEGRATION 见文件头注 2）。
-          { on: 'hit', chance: 0.4, cond: { hpPct: { lte: 0 } }, fx: [
+          // 致命伤免死：hit 钩子在死亡判定之前结算，回血即续命。once=每战仅一次，
+          // 那道「活路」一世只垂一次帘，不再是可反复触发的随机不死。
+          { on: 'hit', chance: 0.4, once: true, cond: { hpPct: { lte: 0 } }, fx: [
             { cheal: 10 },
             { cstun: 1 },
             { clog: { t: '【异象】那一击分明落下了——却像落进了别人的命里。你还站着。', style: '因果' } }

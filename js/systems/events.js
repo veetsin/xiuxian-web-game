@@ -53,6 +53,8 @@
     // ---- 延时安排（eventDelay op） ----
     schedule: function (id, months, note) {
       var w = G.world;
+      // 去重：同一事件已在队列中则不重复排期（防止门槛失效时被反复塞入，如劫道散修连环拦路）
+      for (var i = 0; i < w.eventQueue.length; i++) if (w.eventQueue[i].eventId === id) return;
       var m = w.month + (months || 1);
       var y = w.year;
       while (m > 12) { m -= 12; y++; }
@@ -71,6 +73,9 @@
       due.forEach(function (q) {
         var def = G.get('event', q.eventId);
         if (!def) { console.warn('[EVENT] eventQueue 中事件未注册:', q.eventId); return; }
+        // dueCond：到期时再校验有效性（独立于 cond，仅供需要的剧情事件 opt-in）。
+        // 失效则静默丢弃——例如「武馆之约」到期时大师兄已入仙门离镇，旧约自然作废。
+        if (def.dueCond && !G.cond(def.dueCond)) return;
         G.world.flags['_evdone_' + q.eventId] = true;
         self.pending.push(q.eventId);
       });

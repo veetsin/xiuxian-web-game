@@ -32,7 +32,8 @@
       { branch: { cond: { item: { id: 'xiangzhu', n: 1 } },
         then: [{ itemDel: { id: 'xiangzhu', n: 1 } }],
         else: [{ money: -2 }] } },
-      { tendAdd: { yinguo: 2 } }, { npcFavAdd: { id: 'miaozhu', n: 2 } }
+      { tendAdd: { yinguo: 2 } },
+      { branch: { cond: { npcAlive: 'miaozhu' }, then: [{ npcFavAdd: { id: 'miaozhu', n: 2 } }] } }
     ],
     outcomes: [
       { weight: 5, effects: [{ wvarAdd: { ghostQi: -1 } },
@@ -55,10 +56,11 @@
     outcomes: [
       { weight: 4, effects: [
         { branch: { cond: { npcAlive: 'miaozhu' },
-          then: [{ money: 4 }, { npcFavAdd: { id: 'miaozhu', n: 3 } }],
-          else: [{ money: 2 }] } },
-        { wvarAdd: { ghostQi: -2 } },
-        { log: { t: '一夜只有风声。天亮时庙祝塞给你两个还热的素包子。', style: '平' } }] },
+          then: [{ money: 4 }, { npcFavAdd: { id: 'miaozhu', n: 3 } },
+            { log: { t: '一夜只有风声。天亮时庙祝塞给你两个还热的素包子。', style: '平' } }],
+          else: [{ money: 2 },
+            { log: { t: '一夜只有风声。天亮时香案上搁着两个冷硬的素包子——没见着人。', style: '平' } }] } },
+        { wvarAdd: { ghostQi: -2 } }] },
       { weight: 3, effects: [
         { counterAdd: { xinmo: 2 } }, { wvarAdd: { ghostQi: 2 } }, { tendAdd: { yinguo: 2 } },
         { log: { t: '后半夜，有谁在极轻地数名字。数到你时，风停了。', style: '凶' } }] },
@@ -79,7 +81,8 @@
     id: 'saodian', name: '扫殿', desc: '替庙里扫尘添水，修缮门窗。积德的活，没人跟你抢。',
     loc: 'shanshenmiao', timeCost: 1, risk: 0, order: 30,
     effects: [
-      { tendAdd: { yinguo: 1 } }, { npcFavAdd: { id: 'miaozhu', n: 3 } },
+      { tendAdd: { yinguo: 1 } },
+      { branch: { cond: { npcAlive: 'miaozhu' }, then: [{ npcFavAdd: { id: 'miaozhu', n: 3 } }] } },
       { locvarAdd: { loc: 'shanshenmiao', key: 'corruption', n: -2 } }
     ],
     outcomes: [

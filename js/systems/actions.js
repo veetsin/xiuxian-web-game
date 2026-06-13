@@ -91,8 +91,9 @@
       return true;
     },
 
-    // 行囊使用消耗品（不耗月）
+    // 行囊使用消耗品（不耗月）。战斗中禁用——嗑药要走战斗指令，不能从背包白嫖回合外治疗。
     useItem: function (itemId) {
+      if (G.combat) { if (G.ui && G.ui.toast) G.ui.toast('刀光剑影里，哪有工夫翻找行囊。'); return false; }
       var d = G.get('item', itemId);
       if (!d || d.type !== 'consumable' || G.itemCount(itemId) <= 0) return false;
       if (G.player.dead) return false;

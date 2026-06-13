@@ -264,7 +264,7 @@
     desc: '铁脊武馆的大师兄，名头比馆主还响。他看人的眼神，像在掂一块料。',
     monthly: [
       { // 精进其一：寅时练拳，破入炼气（约两三年内见分晓）
-        cond: { noflag: 'dsx_jingjin_1', noflag: 'dashixiong_li_guan' },
+        cond: { noflag: ['dsx_jingjin_1', 'dashixiong_li_guan'] },
         chance: 0.035,
         effects: [
           { flagSet: { id: 'dsx_jingjin_1' } },
@@ -274,7 +274,7 @@
         note: '大师兄修为精进（其一）'
       },
       { // 精进其二：拳裂石锁，镇子装不下他了
-        cond: { flag: 'dsx_jingjin_1', noflag: 'dsx_jingjin_2', noflag: 'dashixiong_li_guan' },
+        cond: { flag: 'dsx_jingjin_1', noflag: ['dsx_jingjin_2', 'dashixiong_li_guan'] },
         chance: 0.03,
         effects: [
           { flagSet: { id: 'dsx_jingjin_2' } },
@@ -373,7 +373,7 @@
         note: '庙祝日常压阴气'
       },
       { // 异变其一：子时倒插香（邪神线第一记钟）
-        cond: { wvar: { id: 'ghostQi', gte: 45 }, noflag: 'miaozhu_yeji', noflag: 'miaozhu_shizong' },
+        cond: { wvar: { id: 'ghostQi', gte: 45 }, noflag: ['miaozhu_yeji', 'miaozhu_shizong'] },
         chance: 0.3,
         effects: [
           { flagSet: { id: 'miaozhu_yeji' } },
@@ -396,6 +396,7 @@
         chance: 0.3,
         effects: [
           { flagSet: { id: 'miaozhu_shizong' } },
+          { npcSet: { id: 'miaozhu', key: 'alive', v: false } },   // 失踪 → 庙里行动不再把他当在场
           { wvarAdd: { villageFear: 8 } },
           { wvarAdd: { ghostQi: 5 } },
           { rumorAdd: { t: '庙祝不见了。庙门从里头拴着，香炉里的灰，还是温的。', fame: 0 } }
@@ -407,6 +408,7 @@
         chance: 0.3,
         effects: [
           { flagSet: { id: 'miaozhu_shizong', v: false } },
+          { npcSet: { id: 'miaozhu', key: 'alive', v: true } },   // 归来 → 庙里行动恢复在场
           { npcFavAdd: { id: 'miaozhu', n: 10 } },
           { rumorAdd: { t: '庙祝回来了，瘦得脱了形。谁问，他都只说自己在山里迷了路。', fame: 0 } }
         ],
@@ -615,7 +617,7 @@
       },
       { // 盯上玩家：钱多名薄、又在野地里走——下个月，路就不好走了
         cond: { money: { gte: 40 }, fame: { lte: 30 },
-          noflag: 'sanxiu_dingshang', noflag: 'sanxiu_guifu',
+          noflag: ['sanxiu_dingshang', 'sanxiu_guifu'],
           any: [{ loc: 'heishan_waiwei' }, { loc: 'heishan_shenchu' }, { loc: 'feikuang' }, { loc: 'shanshenmiao' }] },
         chance: 0.3,
         effects: [

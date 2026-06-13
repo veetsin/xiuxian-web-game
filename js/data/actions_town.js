@@ -218,8 +218,13 @@
     id: 'mai_shanhuo', name: '卖山货药材', desc: '把皮子、兽牙和药草折给回春堂，价钱随行就市。',
     loc: 'yaopu', timeCost: 1, risk: 0, order: 40,
     cond: { any: [{ item: { id: 'langpi', n: 1 } }, { item: { id: 'langya', n: 1 } },
-                  { item: { id: 'yaolang_ya', n: 1 } }, { item: { id: 'ningxuecao', n: 1 } }] },
+                  { item: { id: 'yaolang_ya', n: 1 } }, { item: { id: 'ningxuecao', n: 1 } },
+                  { item: { id: 'yinsui', n: 1 } }] },
     effects: [
+      { branch: { cond: { item: { id: 'yinsui', n: 1 } }, then: [   // 矿洞尸王身上的阴髓，识货的掌柜肯出大价
+        { itemDel: { id: 'yinsui', n: 1 } }, { npcFavAdd: { id: 'yaopu_laoban', n: 3 } },
+        { branch: { cond: { wvar: { id: 'marketPrice', gte: 115 } }, then: [{ money: 55 }], else: [{ money: 40 }] } },
+        { log: { t: '掌柜的一见那截阴髓，瞳孔一缩，压低声音报了个数。', style: '丹' } }] } },
       { branch: { cond: { item: { id: 'langpi', n: 1 } }, then: [
         { itemDel: { id: 'langpi', n: 1 } },
         { branch: { cond: { wvar: { id: 'marketPrice', gte: 115 } }, then: [{ money: 8 }], else: [{ money: 5 }] } }] } },
@@ -310,7 +315,7 @@
             { log: { t: '你被扭送出门，摔在街心。看门老头直摇头。', style: '凶' } }],
           onFlee: [{ counterAdd: { xinmo: 1 } },
             { log: { t: '你甩脱那只手翻墙就跑，鞋都跑丢了一只。', style: '平' } }] } }] },
-      { weight: 2, effects: [
+      { weight: 2, cond: { noflag: 'dashixiong_li_guan' }, effects: [   // 大师兄已离镇则撞不见他
         { combat: { enemy: 'dashixiong_boss', intro: '院里不知何时立着一条人影。大师兄活动着腕骨：「胆子不小。」',
           onWin: [{ pflagSet: { id: 'wuguan_neitang_de' } }, { fame: 15 },
             { legacySet: { id: 'dashixiong_defeated', v: true } },
@@ -322,6 +327,24 @@
             { log: { t: '他只用了三招。你趴在地上，没看清他怎么出的手。', style: '凶' } }],
           onFlee: [{ counterAdd: { xinmo: 2 } },
             { log: { t: '你抱头翻墙而逃，身后传来一声嗤笑。', style: '凶' } }] } }] }
+    ]
+  });
+
+  // 持「仙门名帖」赴外门试——三年一考的机缘，终于落到了玩法里（飞升仅作传说，本世只记名）
+  G.define('action', {
+    id: 'chi_tie_fu_kao', name: '持帖赴外门试',
+    desc: '九月巡使过镇，可凭名帖往驿馆一试。外门三年一考，过了便在仙门记下名姓。',
+    loc: 'qingshizhen', timeCost: 1, risk: 1, order: 8,
+    cond: { item: { id: 'xianmen_mingtie', n: 1 }, monthIn: [9], nopflag: 'waimen_jiming' },
+    outcomes: [
+      { weight: 5, cond: { realm: { gte: 2 } }, effects: [
+        { itemDel: { id: 'xianmen_mingtie', n: 1 } }, { pflagSet: { id: 'waimen_jiming' } },
+        { fame: 30 }, { cult: 80 }, { wvarAdd: { sectAttention: 12 } },
+        { rumorAdd: { t: '青石镇出了个被仙门外门记名的人。巡使亲手在名册上添了一笔。', fame: 8 } },
+        { log: { t: '考较过后，巡使合扇一礼：「外门记你一名。山门开时，自有人来寻你。」', style: '吉' } }] },
+      { weight: 6, cond: { realm: { lte: 1 } }, effects: [
+        { counterAdd: { xinmo: 2 } },
+        { log: { t: '你连引气都未稳，几道试题下来汗透重衣。巡使收回名帖：「火候未到，三年后再来。」', style: '凶' } }] }
     ]
   });
 })();

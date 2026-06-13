@@ -226,6 +226,7 @@
             warn(W + ' deathCause 引用未知敌人/死因:' + c);
         });
       }
+      if (d.defeatCause) ck('enemy', d.defeatCause, W + '.defeatCause'); // 战败记忆（nonLethal 强敌）
     });
 
     console.log('[VALIDATE] done, ' + issues + ' issues');

@@ -81,10 +81,12 @@
           var val = L ? (typeof L[v.key] === 'number' ? L[v.key] : num((L.vars || {})[v.key])) : 0;
           ok = cmp(val, v);
         } break;
-        case 'flag': ok = !!w.flags[v]; break;
-        case 'noflag': ok = !w.flags[v]; break;
-        case 'pflag': ok = !!p.pflags[v]; break;
-        case 'nopflag': ok = !p.pflags[v]; break;
+        // flag/noflag/pflag/nopflag 接受单个 id 或 id 数组（数组=全部满足，AND）。
+        // 数组形式避免「同一对象写两个 noflag 键被 JS 静默去重」的隐患。
+        case 'flag': ok = Array.isArray(v) ? v.every(function (x) { return !!w.flags[x]; }) : !!w.flags[v]; break;
+        case 'noflag': ok = Array.isArray(v) ? v.every(function (x) { return !w.flags[x]; }) : !w.flags[v]; break;
+        case 'pflag': ok = Array.isArray(v) ? v.every(function (x) { return !!p.pflags[x]; }) : !!p.pflags[v]; break;
+        case 'nopflag': ok = Array.isArray(v) ? v.every(function (x) { return !p.pflags[x]; }) : !p.pflags[v]; break;
         case 'legacy': ok = !!(G.meta && G.meta.legacy[v]); break;
         case 'tend': ok = cmp(num(p.tend[v.id]), v); break;
         case 'daoStage': ok = cmp(num(p.daoStage[v.id]), v); break;
